@@ -19,7 +19,7 @@ while True:
 	# Accepts a single connection
 	client, address = server.accept()
 
-	print "Client address : %s" %% address
+	print address
 
 	# File open in binary mode
 	f = open('file_' + str(i), 'wb')
@@ -37,7 +37,7 @@ while True:
                	l = client.recv(1024)
 	f.close()
 	
-	print "A file has been received"
+	print "File downloading complete!"
     	client.close()
 
 server.close()

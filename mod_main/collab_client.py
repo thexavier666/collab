@@ -25,7 +25,7 @@ class Collab_front:
 	def mod_file_upload(self, file_path, file_name, remote_proxy):
 		"""Used for sending files to a receiver. Sent file will always have the name file_1.txt"""
 
-		new_file_name = file_name + self.local_port
+		new_file_name = file_name + "_" + self.local_port
 
 		with open(file_path, "rb") as handle:
 			bin_data = xmlrpclib.Binary(handle.read())
@@ -37,9 +37,12 @@ class Collab_front:
 ##MAIN MODULE STARTS HERE##
 
 def main():
-	# Connection details of remote node
+
+	# Details of local node
 	local_ip = "localhost"
 	local_port = sys.argv[1]
+
+	# Connection details of remote node
 	remote_ip = "localhost"
 
 	# Getting details of remote node
@@ -70,6 +73,7 @@ def main():
 		elif input_val == "2":
 			file_name = raw_input("\n\tEnter name of file to be uploaded : ")
 
+			# Creaating path of local file about to be uploaded
 			file_path = "./" + file_name
 			
 			local_node.mod_file_upload(file_path, file_name, remote_proxy)

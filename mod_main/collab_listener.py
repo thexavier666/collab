@@ -25,11 +25,13 @@ class Collab_system:
 
 		print "[mod_file_transfer fired]"
 
+		# Creaating path of local file about to be transferred
 		file_path = "./" + file_name
 
 		with open(file_path, "rb") as handle:
 			bin_data = xmlrpclib.Binary(handle.read())
 
+		# Creating connection object of requestor
 		remote_proxy = xmlrpclib.ServerProxy("http://localhost:" + remote_port + "/")
 		
 		# Connecting to requestor's server

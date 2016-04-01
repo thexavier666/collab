@@ -19,6 +19,6 @@ An Incentive Based P2P Distributed File Storage System
  * The file should be in the current directory
 
 ## To do
- * -Currently, this is the upload module. Meaning, the client gives a command to upload to a server. The next aim is to download a file which is residing in the server-
+ * Currently, this is the upload module. Meaning, the client gives a command to upload to a server. The next aim is to download a file which is residing in the server
  * Adding a download bar/current speed
  * Add support to work from another machine (very easy)

@@ -59,6 +59,7 @@ def main():
 		print "\t. : Collab Menu for %s : .\n" % local_port
 		print "\tSearch & download ...[1]"
 		print "\tUpload            ...[2]"
+		print "\tAdmin Mode        ...[3]"
 		print "\tExit              ...[0]"
 
 		input_val = raw_input("\n\n\tEnter option : ")
@@ -79,6 +80,35 @@ def main():
 			local_node.mod_file_upload(file_path, file_name, remote_proxy)
 
 			local_node.return_pause()
+
+		elif input_val == "3":
+			while True:
+				os.system('clear')
+
+				print "\t. : Admin Collab Menu for %s : .\n" % local_port
+				print "\tSee finger table  ...[1]"
+				print "\tList local files  ...[2]"
+				print "\tList query cache  ...[3]"
+				print "\tSee neighbours    ...[4]"
+				print "\tExit              ...[0]"
+
+				admin_inp_val = raw_input("\n\n\tEnter option : ")
+
+				if admin_inp_val == "1":
+					local_node.return_pause()
+				elif admin_inp_val == "2":
+					local_node.return_pause()
+				elif admin_inp_val == "3":
+					local_node.return_pause()
+				elif admin_inp_val == "4":
+					local_node.return_pause()
+				elif admin_inp_val == "0":
+					break
+					local_node.return_pause()
+				else:
+					print "\tIncorrect option value"
+					print "\tTry again..."
+					local_node.return_pause()
 
 		elif input_val == "0":
 			print "\tExiting"

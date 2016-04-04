@@ -50,7 +50,7 @@ class Collab_front:
 			ratio = 0
 		# Only uploads done
 		elif self.upload_amt != 0 and self.download_amt == 0:
-			ratio = "Infinite"
+			ratio = -1
 		# Both done
 		else:
 			ratio = (self.upload_amt * 1.0)/(self.download_amt * 1.0)
@@ -116,7 +116,7 @@ def main():
 				print "\tList query cache  ...[3]"
 				print "\tSee neighbours    ...[4]"
 				print "\tSee statistics    ...[5]"
-				print "\tExit              ...[0]"
+				print "\tBack              ...[0]"
 
 				admin_inp_val = raw_input("\n\n\tEnter option : ")
 

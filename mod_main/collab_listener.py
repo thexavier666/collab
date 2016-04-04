@@ -1,5 +1,6 @@
 import sys
 import xmlrpclib
+import os
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 class Collab_system:
@@ -18,8 +19,6 @@ class Collab_system:
 		with open(new_file_name, "wb") as handle:
 			handle.write(bin_data.data)
 
-		return True
-
 	def mod_file_transfer(self, file_name, remote_port):
 		"""Initiating the file transfer"""
 
@@ -37,7 +36,9 @@ class Collab_system:
 		# Connecting to requestor's server
 		remote_proxy.mod_file_download_receive(bin_data, file_name)
 
-		return True
+		sent_file_size = os.stat(file_path).st_size
+
+		return sent_file_size
 
 	def mod_file_download_receive(self, bin_data, file_name):
 		"""Used to receive a file upon request of a download"""

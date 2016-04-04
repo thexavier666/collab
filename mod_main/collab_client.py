@@ -112,7 +112,7 @@ def main():
 
 				print "\t. : Admin Collab Menu for %s : .\n" % local_port
 				print "\tSee finger table  ...[1]"
-				print "\tList local files  ...[2]"
+				print "\tSee local files   ...[2]"
 				print "\tList query cache  ...[3]"
 				print "\tSee neighbours    ...[4]"
 				print "\tSee statistics    ...[5]"

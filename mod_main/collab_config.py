@@ -1,3 +1,6 @@
+# Key space
+KEY_SIZE 			= 1000000000
+
 # Cache
 DEF_CACHE_SIZE 		= 50
 DEF_CACHE_TIMEOUT 	= 120

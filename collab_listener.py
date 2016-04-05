@@ -9,6 +9,7 @@ from collab_client import Collab_front
 
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
+# This is the listener part and the backend of the application
 
 class Collab_system:
 

@@ -14,14 +14,14 @@ An Incentive Based P2P Distributed File Storage System
  * Upload download files should be in the same directory
 
 ## To do
- * [Done] Currently, this is the upload module. Meaning, the client gives a command to upload to a server. The next aim is to download a file which is residing in the server
+ * [Done] Download from remote
  * [Done] Upload to download ratio
- * [To be done] Incentive/penalty based on ratio
+ * [Done] Incentive/penalty based on ratio
+ * [Done] Sleep based on ratio
  * [To be done] Add support to work from another machine (very easy)
- * [To be done] Sleep based on ratio
  * [Dropped] Adding a download bar/current speed
 
-## [Defunct] How to run the scripts in mod_fileTransfer
+## [Defunct][Removed] How to run the scripts in mod_fileTransfer
  * python fileTransfer_download.py
  * python fileTransfer_upload.py "file name" "sleep time in milisecond"
  * Run the above two commands without the quotes

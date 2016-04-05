@@ -69,18 +69,21 @@ class Collab_system:
 		# Creaating path of local file about to be transferred
 		file_path = "./" + file_name
 
-		with open(file_path, "rb") as handle:
-			bin_data = xmlrpclib.Binary(handle.read())
+		if os.path.exists(file_path):
+			with open(file_path, "rb") as handle:
+				bin_data = xmlrpclib.Binary(handle.read())
 
-		# Creating connection object of requestor
-		remote_proxy = xmlrpclib.ServerProxy("http://localhost:" + remote_port + "/")
-		
-		# Connecting to requestor's server
-		remote_proxy.mod_file_download_receive(bin_data, file_name)
+			# Creating connection object of requestor
+			remote_proxy = xmlrpclib.ServerProxy("http://localhost:" + remote_port + "/")
+			
+			# Connecting to requestor's server
+			remote_proxy.mod_file_download_receive(bin_data, file_name)
 
-		sent_file_size = os.stat(file_path).st_size
+			sent_file_size = os.stat(file_path).st_size
 
-		return sent_file_size
+			return sent_file_size
+		else:
+			return -1
 
 	def mod_file_download_receive(self, bin_data, file_name):
 		"""Used to receive a file upon request of a download"""

@@ -3,6 +3,7 @@ import xmlrpclib
 import os
 
 # This is the front end of the Collab system
+# All functions present in this class are the APIs provided to the user 
 class Collab_front:
 
 	def __init__(self, local_ip, local_port):
@@ -24,9 +25,11 @@ class Collab_front:
 
 		download_file_size = remote_proxy.mod_file_transfer(file_name, self.local_port, self.ratio)
 
-		self.download_amt = self.download_amt + download_file_size
-
-		return True
+		if download_file_size == -1:
+			return False
+		else:
+			self.download_amt = self.download_amt + download_file_size
+			return True
 
 	def mod_file_upload(self, file_path, file_name, remote_proxy):
 		"""Used for sending files to a receiver. Sent file will always have the name file_1.txt"""
@@ -92,7 +95,12 @@ def main():
 		if input_val == "1":
 			file_name = raw_input("\n\tEnter name of file to be downloaded : ")
 
-			local_node.mod_file_download(file_name, remote_proxy)
+			file_lookup = local_node.mod_file_download(file_name, remote_proxy)
+
+			if file_lookup == False:
+				print "\n\tFile not found at remote node!"
+			else:
+				print "\n\tFile downloaded!"
 
 			local_node.return_pause()
 			
@@ -101,8 +109,13 @@ def main():
 
 			# Creaating path of local file about to be uploaded
 			file_path = "./" + file_name
-			
-			local_node.mod_file_upload(file_path, file_name, remote_proxy)
+
+			if os.path.exists(file_path) == True:
+				local_node.mod_file_upload(file_path, file_name, remote_proxy)
+
+				print "\n\tFile uploaded!"
+			else:
+				print "\n\tFile not found at current node!"
 
 			local_node.return_pause()
 

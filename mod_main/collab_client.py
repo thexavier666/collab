@@ -2,11 +2,15 @@ import sys
 import xmlrpclib
 import os
 
+# This is the front end of the Collab system
 class Collab_front:
 
 	def __init__(self, local_ip, local_port):
 		self.local_ip = local_ip
 		self.local_port = local_port
+		self.upload_amt = 1
+		self.download_amt = 1
+		self.ratio = 1
 
 	def return_pause(self):
 		"""Used for creating a pause during input"""
@@ -18,7 +22,9 @@ class Collab_front:
 	def mod_file_download(self, file_name, remote_proxy):
 		"""Sending details to remote node which will send file to local node"""
 
-		remote_proxy.mod_file_transfer(file_name, self.local_port)
+		download_file_size = remote_proxy.mod_file_transfer(file_name, self.local_port, self.ratio)
+
+		self.download_amt = self.download_amt + download_file_size
 
 		return True
 
@@ -32,7 +38,26 @@ class Collab_front:
 
 		remote_proxy.mod_file_receive(bin_data, new_file_name)
 
+		self.upload_amt = self.upload_amt + os.stat(file_path).st_size
+
 		return True
+
+	def mod_show_stats(self):
+		"""Shows all statistics of the current node"""
+
+		# Nothing done
+		if self.upload_amt == 0 and self.download_amt == 0:
+			self.ratio = 0
+		# Only uploads done
+		elif self.upload_amt != 0 and self.download_amt == 0:
+			self.ratio = -1
+		# Both done
+		else:
+			self.ratio = (self.upload_amt * 1.0)/(self.download_amt * 1.0)
+
+		print "\n\t\tUpload   (Bytes) : %d" % (self.upload_amt)
+		print "\n\t\tDownload (Bytes) : %d" % (self.download_amt)
+		print "\n\t\tCurrent ratio    : %f" % (self.ratio)
 
 ##MAIN MODULE STARTS HERE##
 
@@ -59,6 +84,7 @@ def main():
 		print "\t. : Collab Menu for %s : .\n" % local_port
 		print "\tSearch & download ...[1]"
 		print "\tUpload            ...[2]"
+		print "\tAdmin Mode        ...[3]"
 		print "\tExit              ...[0]"
 
 		input_val = raw_input("\n\n\tEnter option : ")
@@ -79,6 +105,45 @@ def main():
 			local_node.mod_file_upload(file_path, file_name, remote_proxy)
 
 			local_node.return_pause()
+
+		elif input_val == "3":
+			while True:
+				os.system('clear')
+
+				print "\t. : Admin Collab Menu for %s : .\n" % local_port
+				print "\tSee finger table  ...[1]"
+				print "\tSee local files   ...[2]"
+				print "\tList query cache  ...[3]"
+				print "\tSee neighbours    ...[4]"
+				print "\tSee statistics    ...[5]"
+				print "\tBack              ...[0]"
+
+				admin_inp_val = raw_input("\n\n\tEnter option : ")
+
+				if admin_inp_val == "1":
+					local_node.return_pause()
+
+				elif admin_inp_val == "2":
+					local_node.return_pause()
+
+				elif admin_inp_val == "3":
+					local_node.return_pause()
+
+				elif admin_inp_val == "4":
+					local_node.return_pause()
+
+				elif admin_inp_val == "5":
+					local_node.mod_show_stats()
+					local_node.return_pause()
+
+				elif admin_inp_val == "0":
+					break
+					local_node.return_pause()
+
+				else:
+					print "\tIncorrect option value"
+					print "\tTry again..."
+					local_node.return_pause()
 
 		elif input_val == "0":
 			print "\tExiting"

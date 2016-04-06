@@ -1,3 +1,5 @@
+# This is the listener part and the backend of the application
+
 import sys
 import xmlrpclib
 import os
@@ -8,13 +10,12 @@ import collab_config as config
 
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
-# This is the listener part and the backend of the application
-
 class collab_backend:
 
 	def __init__(self, local_ip, local_port):
 		self.local_ip = local_ip
 		self.local_port = local_port
+		self.folder_path = folder_path = "collab" + "_" + local_ip + "_" + local_port
 
 	def mod_calc_sleep_time(self, ratio):
 		"""Calculates the sleep time according to ratio"""
@@ -51,7 +52,7 @@ class collab_backend:
 
 		print "[mod_file_receive fired]"
 
-		new_file_name = "./" + file_name
+		new_file_name = self.folder_path + "/" + file_name
 
 		with open(new_file_name, "wb") as handle:
 			handle.write(bin_data.data)
@@ -87,7 +88,7 @@ class collab_backend:
 
 		print "[mod_file_download_receive fired]"
 
-		new_file_name = "./" + file_name + "_" + self.local_port
+		new_file_name = self.folder_path + "/" + file_name
 
 		with open(new_file_name, "wb") as handle:
 			handle.write(bin_data.data)

@@ -1,9 +1,9 @@
+# This is the front end of the Collab system
+# All functions present in this class are the APIs provided to the user
+
 import sys
 import xmlrpclib
 import os
-
-# This is the front end of the Collab system
-# All functions present in this class are the APIs provided to the user
 
 class collab_frontend:
 
@@ -13,6 +13,9 @@ class collab_frontend:
 		self.upload_amt = 1
 		self.download_amt = 1
 		self.ratio = 1
+		self.folder_path = folder_path = "collab" + "_" + local_ip + "_" + local_port
+
+		os.makedirs(folder_path)
 
 	def return_pause(self):
 		"""Used for creating a pause during input"""
@@ -35,12 +38,12 @@ class collab_frontend:
 	def mod_file_upload(self, file_path, file_name, remote_proxy):
 		"""Used for sending files to a receiver. Sent file will always have the name file_1.txt"""
 
-		new_file_name = file_name + "_" + self.local_port
+		#new_file_name = file_name + "_" + self.local_port
 
 		with open(file_path, "rb") as handle:
 			bin_data = xmlrpclib.Binary(handle.read())
 
-		remote_proxy.mod_file_receive(bin_data, new_file_name)
+		remote_proxy.mod_file_receive(bin_data, file_name)
 
 		self.upload_amt = self.upload_amt + os.stat(file_path).st_size
 
@@ -77,7 +80,7 @@ def main():
 	while True:
 		os.system('clear')
 
-		print "\t. : Collab Menu for %s : .\n" % local_port
+		print "\n\n\t. : Collab Menu for %s : .\n" % local_port
 		print "\tSearch & download 		...[1]"
 		print "\tUpload            		...[2]"
 		print "\tAdmin Menu        		...[3]"
@@ -151,14 +154,14 @@ def main():
 					local_node.return_pause()
 
 		elif input_val == "0":
-			print "\tThank you for using Collab!..."
+			print "\n\tThank you for using Collab!"
 			local_node.return_pause()
 			
 			break
 
 		else:
-			print "\tIncorrect option value"
-			print "\tTry again..."
+			print "\n\tIncorrect option value"
+			print "\n\tTry again..."
 			local_node.return_pause()
 
 	os.system('clear')

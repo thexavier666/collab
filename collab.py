@@ -1,11 +1,16 @@
-# This is the front end of the Collab system
-# All functions present in this class are the APIs provided to the user
+# The Collab system consisting of the frontend and the backend
 
 import sys
 import xmlrpclib
 import os
+import threading
+import time
 
-class collab_frontend:
+import collab_config as config
+
+from SimpleXMLRPCServer import SimpleXMLRPCServer
+
+class collab_system:
 
 	def __init__(self, local_ip, local_port):
 		self.local_ip = local_ip
@@ -14,8 +19,6 @@ class collab_frontend:
 		self.download_amt = 1
 		self.ratio = 1
 		self.folder_path = folder_path = "collab" + "_" + local_ip + "_" + local_port
-
-		os.makedirs(folder_path)
 
 	def return_pause(self):
 		"""Used for creating a pause during input"""
@@ -38,8 +41,6 @@ class collab_frontend:
 	def mod_file_upload(self, file_path, file_name, remote_proxy):
 		"""Used for sending files to a receiver. Sent file will always have the name file_1.txt"""
 
-		#new_file_name = file_name + "_" + self.local_port
-
 		with open(file_path, "rb") as handle:
 			bin_data = xmlrpclib.Binary(handle.read())
 
@@ -58,7 +59,83 @@ class collab_frontend:
 		print "\n\t\tDownload (Bytes) : %d" % (self.download_amt)
 		print "\n\t\tCurrent ratio    : %f" % (self.ratio)
 
-##MAIN MODULE STARTS HERE##
+	def mod_calc_sleep_time(self, ratio):
+		"""Calculates the sleep time according to ratio"""
+
+		# Ratio infinite or or greater than 1
+		if ratio > 1:
+			return 0
+
+		# No download or upload done yet or ratio is exactly 1
+		elif ratio == 1:
+			return config.DEF_SLEEP_TIME
+
+		# Ratio is less than 1
+		elif ratio >= 0.1 and ratio < 1:
+			return config.SLEEP_LEVEL_1
+
+		elif ratio >= 0.01 and ratio < 0.1:
+			return config.SLEEP_LEVEL_2
+
+		elif ratio >= 0.001 and ratio < 0.01:
+			return config.SLEEP_LEVEL_3
+
+		else:
+			return config.SLEEP_LEVEL_4
+
+	def mod_download_sleep(self, ratio):
+		"""A function which delays the download according to the ratio"""
+
+		##print "Sleep Time : %d" % self.mod_calc_sleep_time(ratio)
+		time.sleep(self.mod_calc_sleep_time(ratio))
+
+	def mod_file_receive(self, bin_data, file_name):
+		"""Used to receive a file upon a request of an upload"""
+
+		##print "[mod_file_receive fired]"
+
+		new_file_name = self.folder_path + "/" + file_name
+
+		with open(new_file_name, "wb") as handle:
+			handle.write(bin_data.data)
+
+	def mod_file_transfer(self, file_name, remote_port, remote_ratio):
+		"""Initiating the file transfer"""
+
+		##print "[mod_file_transfer fired]"
+
+		self.mod_download_sleep(remote_ratio)
+
+		# Creaating path of local file about to be transferred
+		file_path = self.folder_path + "/" + file_name
+
+		if os.path.exists(file_path):
+			with open(file_path, "rb") as handle:
+				bin_data = xmlrpclib.Binary(handle.read())
+
+			# Creating connection object of requestor
+			remote_proxy = xmlrpclib.ServerProxy("http://localhost:" + remote_port + "/")
+			
+			# Connecting to requestor's server
+			remote_proxy.mod_file_download_receive(bin_data, file_name)
+
+			sent_file_size = os.stat(file_path).st_size
+
+			return sent_file_size
+		else:
+			return -1
+
+	def mod_file_download_receive(self, bin_data, file_name):
+		"""Used to receive a file upon request of a download"""
+
+		##print "[mod_file_download_receive fired]"
+
+		new_file_name = self.folder_path + "/" + file_name
+
+		with open(new_file_name, "wb") as handle:
+			handle.write(bin_data.data)
+
+		return True
 
 def main():
 
@@ -66,16 +143,34 @@ def main():
 	local_ip = "localhost"
 	local_port = sys.argv[1]
 
-	# Connection details of remote node
-	remote_ip = "localhost"
+	# Declared an XMLRPC server
+	# This is the listener part of the application
+	local_listener = SimpleXMLRPCServer((local_ip, int(local_port)), allow_none = True)
+	print "[Listening on port : %s]" % local_port
+
+	local_listener.register_introspection_functions()
+	local_listener.register_multicall_functions()
+	local_listener.register_instance(collab_system(local_ip, local_port))
+
+	# Initialized the XMLRPC server
+	server_thread = threading.Thread(target=local_listener.serve_forever)
+
+	try:
+		server_thread.start()
+	except(KeyboardInterrupt, SystemExit):
+		cleanup_stop_thread()
+		sys.exit()
 
 	# Getting details of remote node
+	remote_ip = "localhost"
 	remote_port = raw_input("\n\tEnter remote port ID : ")
 
 	# Creating connection details of remote node
 	remote_proxy = xmlrpclib.ServerProxy("http://" + remote_ip + ":" + remote_port + "/")
 
-	local_node = collab_frontend(local_ip, local_port)
+	local_node = collab_system(local_ip, local_port)
+
+	os.makedirs(local_node.folder_path)
 
 	while True:
 		os.system('clear')
@@ -168,4 +263,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-

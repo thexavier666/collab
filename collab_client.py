@@ -3,7 +3,8 @@ import xmlrpclib
 import os
 
 # This is the front end of the Collab system
-# All functions present in this class are the APIs provided to the user 
+# All functions present in this class are the APIs provided to the user
+
 class collab_frontend:
 
 	def __init__(self, local_ip, local_port):
@@ -85,10 +86,10 @@ def main():
 		os.system('clear')
 
 		print "\t. : Collab Menu for %s : .\n" % local_port
-		print "\tSearch & download ...[1]"
-		print "\tUpload            ...[2]"
-		print "\tAdmin Mode        ...[3]"
-		print "\tExit              ...[0]"
+		print "\tSearch & download 		...[1]"
+		print "\tUpload            		...[2]"
+		print "\tAdmin Menu        		...[3]"
+		print "\tExit              		...[0]"
 
 		input_val = raw_input("\n\n\tEnter option : ")
 
@@ -123,13 +124,13 @@ def main():
 			while True:
 				os.system('clear')
 
-				print "\t. : Admin Collab Menu for %s : .\n" % local_port
-				print "\tSee finger table  ...[1]"
-				print "\tSee local files   ...[2]"
-				print "\tList query cache  ...[3]"
-				print "\tSee neighbours    ...[4]"
-				print "\tSee statistics    ...[5]"
-				print "\tBack              ...[0]"
+				print "\t. : Admin Menu for %s : .\n" % local_port
+				print "\tSee finger table  		...[1]"
+				print "\tSee local files   		...[2]"
+				print "\tSee query cache  		...[3]"
+				print "\tSee neighbours    		...[4]"
+				print "\tSee statistics    		...[5]"
+				print "\tBack              		...[0]"
 
 				admin_inp_val = raw_input("\n\n\tEnter option : ")
 
@@ -151,7 +152,6 @@ def main():
 
 				elif admin_inp_val == "0":
 					break
-					local_node.return_pause()
 
 				else:
 					print "\tIncorrect option value"
@@ -159,7 +159,9 @@ def main():
 					local_node.return_pause()
 
 		elif input_val == "0":
-			print "\tExiting"
+			print "\tThank you for using Collab!..."
+			local_node.return_pause()
+			
 			break
 
 		else:

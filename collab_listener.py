@@ -8,6 +8,7 @@ import collab_config as config
 
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
+# This is the listener part and the backend of the application
 
 class collab_backend:
 

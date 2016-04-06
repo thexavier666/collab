@@ -49,15 +49,7 @@ class collab_frontend:
 	def mod_show_stats(self):
 		"""Shows all statistics of the current node"""
 
-		# Nothing done
-		if self.upload_amt == 0 and self.download_amt == 0:
-			self.ratio = 0
-		# Only uploads done
-		elif self.upload_amt != 0 and self.download_amt == 0:
-			self.ratio = -1
-		# Both done
-		else:
-			self.ratio = (self.upload_amt * 1.0)/(self.download_amt * 1.0)
+		self.ratio = (self.upload_amt * 1.0)/(self.download_amt * 1.0)
 
 		print "\n\t\tUpload   (Bytes) : %d" % (self.upload_amt)
 		print "\n\t\tDownload (Bytes) : %d" % (self.download_amt)

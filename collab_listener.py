@@ -19,7 +19,16 @@ class collab_backend:
 	def mod_calc_sleep_time(self, ratio):
 		"""Calculates the sleep time according to ratio"""
 
-		if ratio >= 0.1 and ratio < 1:
+		# Ratio infinite or or greater than 1
+		if ratio > 1:
+			return 0
+
+		# No download or upload done yet or ratio is exactly 1
+		elif ratio == 1:
+			return config.DEF_SLEEP_TIME
+
+		# Ratio is less than 1
+		elif ratio >= 0.1 and ratio < 1:
 			return config.SLEEP_LEVEL_1
 
 		elif ratio >= 0.01 and ratio < 0.1:
@@ -34,20 +43,8 @@ class collab_backend:
 	def mod_download_sleep(self, ratio):
 		"""A function which delays the download according to the ratio"""
 
-		# Ratio infinite or or greater than 1
-		if ratio == -1 or ratio > 1:
-			time.sleep(0)
-			print "Sleep Time : 0"
-
-		# No download or upload done yet or ratio is exactly 1
-		elif ratio == 0 or ratio == 1:
-			time.sleep(config.DEF_SLEEP_TIME)
-			print "Sleep Time : %d" % config.DEF_SLEEP_TIME
-
-		# Ratio is less than 1
-		else:
-			print "Sleep Time : %d" % self.mod_calc_sleep_time(ratio)
-			time.sleep(self.mod_calc_sleep_time(ratio))
+		print "Sleep Time : %d" % self.mod_calc_sleep_time(ratio)
+		time.sleep(self.mod_calc_sleep_time(ratio))
 
 	def mod_file_receive(self, bin_data, file_name):
 		"""Used to receive a file upon a request of an upload"""

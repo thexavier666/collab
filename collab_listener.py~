@@ -5,11 +5,13 @@ import time
 import math
 
 import collab_config as config
+from collab_client import Collab_front
 
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
+# This is the listener part and the backend of the application
 
-class collab_backend:
+class Collab_system:
 
 	def __init__(self, local_ip, local_port):
 		self.local_ip = local_ip
@@ -101,16 +103,15 @@ def main():
 	local_port = sys.argv[1]
 
 	# Declared an XMLRPC server
-	local_node = SimpleXMLRPCServer((local_ip, int(local_port)), allow_none = True)
+	Collab_node = SimpleXMLRPCServer((local_ip, int(local_port)), allow_none = True)
 	print "[Listening on port : %s]" % local_port
 
-	local_node.register_introspection_functions()
-	local_node.register_multicall_functions()
-	local_node.register_instance(collab_backend(local_ip, local_port))
+	Collab_node.register_introspection_functions()
+	Collab_node.register_multicall_functions()
+	Collab_node.register_instance(Collab_system(local_ip, local_port))
 
 	# Initialized the XMLRPC server
-	local_node.serve_forever()
+	Collab_node.serve_forever()
 
 if __name__ == '__main__':
 	main()
-

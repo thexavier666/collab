@@ -1,5 +1,9 @@
 # The Collab system consisting of the frontend and the backend
 
+# . : NOTE : .
+# All comments starting with '##' are used for debugging purpose
+# Disable the comments to see whether the modules are firing or not
+
 import sys
 import xmlrpclib
 import os
@@ -14,12 +18,14 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 class collab_system:
 
 	def __init__(self, local_ip, local_port):
-		self.local_ip = local_ip
-		self.local_port = local_port
-		self.upload_amt = 1
-		self.download_amt = 1
-		self.ratio = 1
-		self.folder_path = folder_path = "collab" + "_" + local_ip + "_" + local_port
+		self.local_ip 		= local_ip
+		self.local_port 	= local_port
+		self.upload_amt 	= 1
+		self.download_amt 	= 1
+		self.ratio 			= 1
+		self.folder_path 	= "collab" + "_" + local_ip + "_" + local_port
+
+	# These functions are used in the frontend
 
 	def return_pause(self):
 		"""Used for creating a pause during input"""
@@ -31,7 +37,7 @@ class collab_system:
 	def mod_file_download(self, file_name, remote_proxy):
 		"""Sending details to remote node which will send file to local node"""
 
-		download_file_size = remote_proxy.mod_file_transfer(file_name, self.local_port, self.ratio)
+		download_file_size = remote_proxy.mod_file_download_transfer(file_name, self.local_port, self.ratio)
 
 		if download_file_size == -1:
 			return False
@@ -45,7 +51,7 @@ class collab_system:
 		with open(file_path, "rb") as handle:
 			bin_data = xmlrpclib.Binary(handle.read())
 
-		remote_proxy.mod_file_receive(bin_data, file_name)
+		remote_proxy.mod_file_upload_receive(bin_data, file_name)
 
 		self.upload_amt = self.upload_amt + os.stat(file_path).st_size
 
@@ -60,37 +66,9 @@ class collab_system:
 		print "\n\t\tDownload (Bytes) : %d" % (self.download_amt)
 		print "\n\t\tCurrent ratio    : %f" % (self.ratio)
 
-	def mod_calc_sleep_time(self, ratio):
-		"""Calculates the sleep time according to ratio"""
+	# These functions are used in the backend
 
-		# Ratio infinite or or greater than 1
-		if ratio > 1:
-			return 0
-
-		# No download or upload done yet or ratio is exactly 1
-		elif ratio == 1:
-			return config.DEF_SLEEP_TIME
-
-		# Ratio is less than 1
-		elif ratio >= 0.1 and ratio < 1:
-			return config.SLEEP_LEVEL_1
-
-		elif ratio >= 0.01 and ratio < 0.1:
-			return config.SLEEP_LEVEL_2
-
-		elif ratio >= 0.001 and ratio < 0.01:
-			return config.SLEEP_LEVEL_3
-
-		else:
-			return config.SLEEP_LEVEL_4
-
-	def mod_download_sleep(self, ratio):
-		"""A function which delays the download according to the ratio"""
-
-		##print "Sleep Time : %d" % self.mod_calc_sleep_time(ratio)
-		time.sleep(self.mod_calc_sleep_time(ratio))
-
-	def mod_file_receive(self, bin_data, file_name):
+	def mod_file_upload_receive(self, bin_data, file_name):
 		"""Used to receive a file upon a request of an upload"""
 
 		##print "[mod_file_receive fired]"
@@ -100,7 +78,7 @@ class collab_system:
 		with open(new_file_name, "wb") as handle:
 			handle.write(bin_data.data)
 
-	def mod_file_transfer(self, file_name, remote_port, remote_ratio):
+	def mod_file_download_transfer(self, file_name, remote_port, remote_ratio):
 		"""Initiating the file transfer"""
 
 		##print "[mod_file_transfer fired]"
@@ -138,6 +116,38 @@ class collab_system:
 
 		return True
 
+	def mod_download_calc_sleep(self, ratio):
+		"""Calculates the sleep time according to ratio"""
+
+		# Ratio infinite or or greater than 1
+		if ratio > 1:
+			return 0
+
+		# No download or upload done yet or ratio is exactly 1
+		elif ratio == 1:
+			return config.DEF_SLEEP_TIME
+
+		# Ratio is less than 1
+		elif ratio >= 0.1 and ratio < 1:
+			return config.SLEEP_LEVEL_1
+
+		elif ratio >= 0.01 and ratio < 0.1:
+			return config.SLEEP_LEVEL_2
+
+		elif ratio >= 0.001 and ratio < 0.01:
+			return config.SLEEP_LEVEL_3
+
+		else:
+			return config.SLEEP_LEVEL_4
+
+	def mod_download_sleep(self, ratio):
+		"""A function which delays the download according to the ratio"""
+
+		##print "Sleep Time : %d" % self.mod_calc_sleep_time(ratio)
+		time.sleep(self.mod_download_calc_sleep(ratio))
+
+	# These functions are used in both frontend and backend
+
 	def mod_hash(self, given_str, search_space):
 		hash_digest = hashlib.sha1()
 		hash_digest.update(given_str)
@@ -145,37 +155,35 @@ class collab_system:
 
 def main():
 
-	# Details of local node
+	# Details of current node
 	local_ip = "localhost"
 	local_port = sys.argv[1]
 
 	# Declared an XMLRPC server
 	# This is the listener part of the application
 	local_listener = SimpleXMLRPCServer((local_ip, int(local_port)), allow_none = True)
-	print "[Listening on port : %s]" % local_port
+	
+	##print "[Listening on port : %s]" % local_port
 
 	local_listener.register_introspection_functions()
 	local_listener.register_multicall_functions()
 	local_listener.register_instance(collab_system(local_ip, local_port))
 
-	# Initialized the XMLRPC server
-	server_thread = threading.Thread(target=local_listener.serve_forever)
+	# Initialized the XMLRPC server in a seperate thread
+	server_thread = threading.Thread(target = local_listener.serve_forever)
+	server_thread.start()
 
-	try:
-		server_thread.start()
-	except(KeyboardInterrupt, SystemExit):
-		cleanup_stop_thread()
-		sys.exit()
-
-	# Getting details of remote node
+	# Details of remote node
 	remote_ip = "localhost"
 	remote_port = raw_input("\n\tEnter remote port ID : ")
 
 	# Creating connection details of remote node
 	remote_proxy = xmlrpclib.ServerProxy("http://" + remote_ip + ":" + remote_port + "/")
 
+	# Creating the local object
 	local_node = collab_system(local_ip, local_port)
 
+	# Creating the folder which will contain all uploads and downloads
 	os.makedirs(local_node.folder_path)
 
 	while True:
@@ -220,7 +228,7 @@ def main():
 			while True:
 				os.system('clear')
 
-				print "\t. : Admin Menu for %s : .\n" % local_port
+				print "\n\n\t. : Admin Menu for %s : .\n" % local_port
 				print "\tSee finger table  		...[1]"
 				print "\tSee local files   		...[2]"
 				print "\tSee query cache  		...[3]"

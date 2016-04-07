@@ -5,8 +5,9 @@ import xmlrpclib
 import os
 import threading
 import time
+import hashlib
 
-import collab_config as config
+import config
 
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
@@ -136,6 +137,11 @@ class collab_system:
 			handle.write(bin_data.data)
 
 		return True
+
+	def mod_hash(self, given_str, search_space):
+		hash_digest = hashlib.sha1()
+		hash_digest.update(given_str)
+		return int(hash_digest.hexdigest(),16) % search_space
 
 def main():
 

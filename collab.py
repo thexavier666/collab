@@ -43,6 +43,9 @@ class collab_system:
 			return False
 		else:
 			self.download_amt = self.download_amt + download_file_size
+
+			self.mod_update_ratio()
+
 			return True
 
 	def mod_file_upload(self, file_path, file_name, remote_proxy):
@@ -55,16 +58,22 @@ class collab_system:
 
 		self.upload_amt = self.upload_amt + os.stat(file_path).st_size
 
+		self.mod_update_ratio()
+
 		return True
 
 	def mod_show_stats(self):
 		"""Shows all statistics of the current node"""
 
-		self.ratio = (self.upload_amt * 1.0)/(self.download_amt * 1.0)
-
 		print "\n\t\tUpload   (Bytes) : %d" % (self.upload_amt)
 		print "\n\t\tDownload (Bytes) : %d" % (self.download_amt)
 		print "\n\t\tCurrent ratio    : %f" % (self.ratio)
+
+	def mod_show_files(self):
+		return os.listdir("./" + self.folder_path + "/")
+
+	def mod_update_ratio(self):
+		self.ratio = (self.upload_amt * 1.0)/(self.download_amt * 1.0)
 
 	# These functions are used in the backend
 
@@ -100,6 +109,12 @@ class collab_system:
 
 			sent_file_size = os.stat(file_path).st_size
 
+			self.upload_amt = self.upload_amt + sent_file_size
+
+			# print "Something should be happening :( %d" % self.upload_amt
+
+			self.mod_update_ratio()
+
 			return sent_file_size
 		else:
 			return -1
@@ -113,6 +128,8 @@ class collab_system:
 
 		with open(new_file_name, "wb") as handle:
 			handle.write(bin_data.data)
+
+		self.mod_update_ratio()
 
 		return True
 
@@ -242,6 +259,16 @@ def main():
 					local_node.return_pause()
 
 				elif admin_inp_val == "2":
+					file_list = local_node.mod_show_files()
+
+					if file_list:
+						print "\n\tThe files are...\n"
+
+						for files in file_list:
+							print "\t\t%s" % files
+					else:
+						print "\n\tThe current directory is empty...\n"
+
 					local_node.return_pause()
 
 				elif admin_inp_val == "3":

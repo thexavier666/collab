@@ -23,9 +23,12 @@ An Incentive Based P2P Distributed File Storage System
  * [Done] Download from remote
  * [Done] Upload to download ratio
  * [Done] Incentive/penalty based on ratio
- * [Done] Sleep based on ratio
  * [To be done] Add support to work from another machine (very easy)
  * [To be done] Kill the server running in the background nicely
+ * [To be done] Integrate the hash function in the upload and download function
+ * [To be done] Put the downloaded files in a separate folder so that these files are not hosted
+ * [To be done] Fix the bug where remote downloads are not counted as uploads by the remote server
+ * [To be done] An indicator to show that the file has been found and now it's being downloaded
  * [Dropped] Adding a download bar/current speed
 
 ## [Defunct][Removed] How to run the scripts in mod_fileTransfer

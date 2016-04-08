@@ -1,16 +1,31 @@
 # Key space
-KEY_SIZE 			= 1000000000
+def KEY_SPACE():
+	return 1000000000
 
 # Cache
-DEF_CACHE_SIZE 		= 50
-DEF_CACHE_TIMEOUT 	= 120
+def DEF_CACHE_SIZE():
+	return 50
+
+def DEF_CACHE_TIMEOUT():
+	return 120
 
 # Probing
-DEF_PROBE_TIME 		= 10
+def DEF_PROBE_TIME():
+	return 10
 
 # Sleep times
-DEF_SLEEP_TIME 		= 1
-SLEEP_LEVEL_1 		= 2
-SLEEP_LEVEL_2 		= 3
-SLEEP_LEVEL_3 		= 4
-SLEEP_LEVEL_4 		= 5
+def SLEEP_TIME_LEVEL_DEF():
+	return 1
+
+def SLEEP_TIME_LEVEL_1():
+	return 2
+
+def SLEEP_TIME_LEVEL_2():
+        return 3
+
+def SLEEP_TIME_LEVEL_3():
+        return 4
+
+def SLEEP_TIME_LEVEL_4():
+        return 5
+

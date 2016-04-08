@@ -142,20 +142,20 @@ class collab_system:
 
 		# No download or upload done yet or ratio is exactly 1
 		elif ratio == 1:
-			return config.DEF_SLEEP_TIME
+			return config.SLEEP_TIME_LEVEL_DEF()
 
 		# Ratio is less than 1
 		elif ratio >= 0.1 and ratio < 1:
-			return config.SLEEP_LEVEL_1
+			return config.SLEEP_TIME_LEVEL_1()
 
 		elif ratio >= 0.01 and ratio < 0.1:
-			return config.SLEEP_LEVEL_2
+			return config.SLEEP_TIME_LEVEL_2()
 
 		elif ratio >= 0.001 and ratio < 0.01:
-			return config.SLEEP_LEVEL_3
+			return config.SLEEP_TIME_LEVEL_3()
 
 		else:
-			return config.SLEEP_LEVEL_4
+			return config.SLEEP_TIME_LEVEL_4()
 
 	def mod_download_sleep(self, ratio):
 		"""A function which delays the download according to the ratio"""

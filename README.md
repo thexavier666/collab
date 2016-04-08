@@ -4,7 +4,13 @@ An Incentive Based P2P Distributed File Storage System
 ## Current features
  * Can connect to another node but in the same machine
  * Can upload and download files from each other
- * Upload to download ratio
+ * Can view list of files which are hosted by the current node
+ * Incentive and penalty based on upload to download ratio
+
+## Changelog
+ * Added a hash function which takes a string and a key space as input and returns a number. Key space is defined in the config file
+ * Made the application as a single file
+ * Added a configuration file named 'config.py' which consists of getter functions of different constants which are used by the various components of the system
 
 ## How to run the scripts in mod_main
  * Run the following two commands for each node
@@ -19,6 +25,7 @@ An Incentive Based P2P Distributed File Storage System
  * [Done] Incentive/penalty based on ratio
  * [Done] Sleep based on ratio
  * [To be done] Add support to work from another machine (very easy)
+ * [To be done] Kill the server running in the background nicely
  * [Dropped] Adding a download bar/current speed
 
 ## [Defunct][Removed] How to run the scripts in mod_fileTransfer

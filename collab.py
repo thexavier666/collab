@@ -124,7 +124,7 @@ class collab_system:
 
 		##print "[mod_file_download_receive fired]"
 
-		new_file_name = self.folder_path + "/" + file_name
+		new_file_name = "./" + file_name
 
 		with open(new_file_name, "wb") as handle:
 			handle.write(bin_data.data)
@@ -171,7 +171,6 @@ class collab_system:
 		return int(hash_digest.hexdigest(),16) % search_space
 
 def main():
-
 	# Details of current node
 	local_ip = "localhost"
 	local_port = sys.argv[1]
@@ -188,6 +187,12 @@ def main():
 
 	# Initialized the XMLRPC server in a seperate thread
 	server_thread = threading.Thread(target = local_listener.serve_forever)
+
+	# Making the server thread a daemon process so that the server dies when the
+	# client exits the front end
+	server_thread.daemon = True
+
+	# Starting the server thread
 	server_thread.start()
 
 	# Details of remote node

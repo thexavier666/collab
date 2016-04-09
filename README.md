@@ -11,8 +11,10 @@ An Incentive Based P2P Distributed File Storage System
  * Added a hash function which takes a string and a key space as input and returns a number. Key space is defined in the config file
  * Made the application as a single file
  * Added a configuration file named 'config.py' which consists of getter functions of different constants which are used by the various components of the system
+ * Daemonized the listener thread
+ * All downloads will take place in the current directory of the application while the uploads are saved in the collab directory
 
-## How to run the scripts in mod_main
+## How to run Collab
  * Run the following two commands for each node
  * python collab_listener port_number
  * python collab_client port_number
@@ -21,9 +23,8 @@ An Incentive Based P2P Distributed File Storage System
 
 ## To do
  * [To be done] Add support to work from another machine (very easy)
- * [To be done] Kill the server running in the background nicely
+ * [Done] Kill the server running in the background nicely
  * [To be done] Integrate the hash function in the upload and download function
- * [To be done] Put the downloaded files in a separate folder so that these files are not hosted
+ * [Done] Put the downloaded files in a separate folder so that these files are not hosted
  * [To be done] Fix the bug where remote downloads are not counted as uploads by the remote server
- * [To be done] An indicator to show that the file has been found and now it's being downloaded
-
+ * [To be done] Data structure (Dictionary) of files downloaded at current node

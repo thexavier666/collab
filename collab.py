@@ -256,7 +256,7 @@ def main():
 				print "\tSee query cache  		...[3]"
 				print "\tSee neighbours    		...[4]"
 				print "\tSee statistics    		...[5]"
-				print "\tBack              		...[0]"
+				print "\t<< Back <<            		...[0]"
 
 				admin_inp_val = raw_input("\n\n\tEnter option : ")
 

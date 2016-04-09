@@ -15,11 +15,9 @@ An Incentive Based P2P Distributed File Storage System
  * All downloads will take place in the current directory of the application while the uploads are saved in the collab directory
 
 ## How to run Collab
- * Run the following two commands for each node
- * python collab_listener port_number
- * python collab_client port_number
- * Inside collab_client, enter remote port as the port ID of the other node. Currently, the system supports pair wise connections
- * Upload download files should be in the same directory
+ * Run the following command for each node
+ * python collab.py port_number
+ * Inside the application, enter remote port as the port ID of the other node. Currently, the system supports pair wise connections
 
 ## To do
  * [To be done] Add support to work from another machine (very easy)

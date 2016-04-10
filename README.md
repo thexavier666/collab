@@ -13,6 +13,9 @@ An Incentive Based P2P Distributed File Storage System
  * Added a configuration file named 'config.py' which consists of getter functions of different constants which are used by the various components of the system
  * Daemonized the listener thread
  * All downloads will take place in the current directory of the application while the uploads are saved in the collab directory
+ * Integration of hash function
+ * Made a dictionary of files stored in the current node
+ * Upload and download amounts now currently reflect what actually happens
 
 ## How to run Collab
  * Run the following command for each node
@@ -22,7 +25,7 @@ An Incentive Based P2P Distributed File Storage System
 ## To do
  * [To be done] Add support to work from another machine (very easy)
  * [Done] Kill the server running in the background nicely
- * [To be done] Integrate the hash function in the upload and download function
+ * [Done] Integrate the hash function in the upload and download function
  * [Done] Put the downloaded files in a separate folder so that these files are not hosted
- * [To be done] Fix the bug where remote downloads are not counted as uploads by the remote server
- * [To be done] Data structure (Dictionary) of files downloaded at current node
+ * [Done] Fix the bug where remote downloads are not counted as uploads by the remote server
+ * [Done] Data structure (Dictionary) of files downloaded at current node

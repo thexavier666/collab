@@ -24,6 +24,7 @@ class collab_system:
 		self.download_amt 	= 1
 		self.ratio 			= 1
 		self.folder_path 	= "collab" + "_" + local_ip + "_" + local_port
+		self.file_dict		= {}
 
 	# These functions are used in the frontend
 
@@ -37,7 +38,9 @@ class collab_system:
 	def mod_file_download(self, file_name, remote_proxy):
 		"""Sending details to remote node which will send file to local node"""
 
-		download_file_size = remote_proxy.mod_file_download_transfer(file_name, self.local_port, self.ratio)
+		hash_digest = self.mod_hash_string(file_name)
+
+		download_file_size = remote_proxy.mod_file_download_transfer(hash_digest, self.local_port, self.ratio)
 
 		if download_file_size == -1:
 			return False
@@ -49,18 +52,21 @@ class collab_system:
 			return True
 
 	def mod_file_upload(self, file_path, file_name, remote_proxy):
-		"""Used for sending files to a receiver. Sent file will always have the name file_1.txt"""
+		"""Used for sending files to a receiver"""
 
 		with open(file_path, "rb") as handle:
 			bin_data = xmlrpclib.Binary(handle.read())
 
-		remote_proxy.mod_file_upload_receive(bin_data, file_name)
+		if remote_proxy.mod_file_upload_receive(bin_data, file_name) == True:
 
-		self.upload_amt = self.upload_amt + os.stat(file_path).st_size
+			self.upload_amt = self.upload_amt + os.stat(file_path).st_size
 
-		self.mod_update_ratio()
+			self.mod_update_ratio()
 
-		return True
+			return True
+
+		else:
+			return False
 
 	def mod_show_stats(self):
 		"""Shows all statistics of the current node"""
@@ -70,9 +76,13 @@ class collab_system:
 		print "\n\t\tCurrent ratio    : %f" % (self.ratio)
 
 	def mod_show_files(self):
-		return os.listdir("./" + self.folder_path + "/")
+		"""Returns a list of files present in the current directory"""
+
+		return self.file_dict.values()
 
 	def mod_update_ratio(self):
+		"""Updated the upload to download ratio"""
+
 		self.ratio = (self.upload_amt * 1.0)/(self.download_amt * 1.0)
 
 	# These functions are used in the backend
@@ -82,12 +92,23 @@ class collab_system:
 
 		##print "[mod_file_receive fired]"
 
-		new_file_name = self.folder_path + "/" + file_name
+		# File not present in node, thus upload can proceed
+		if self.mod_hash_check_file(self.mod_hash_string(file_name)) == False:
 
-		with open(new_file_name, "wb") as handle:
-			handle.write(bin_data.data)
+			new_file_name = self.folder_path + "/" + file_name
 
-	def mod_file_download_transfer(self, file_name, remote_port, remote_ratio):
+			with open(new_file_name, "wb") as handle:
+				handle.write(bin_data.data)
+
+			# Adding the file name to the hashed list of files
+			self.mod_file_list_append(file_name)		
+
+			return True
+		else:
+
+			return False
+
+	def mod_file_download_transfer(self, given_hash, remote_port, remote_ratio):
 		"""Initiating the file transfer"""
 
 		##print "[mod_file_transfer fired]"
@@ -95,9 +116,13 @@ class collab_system:
 		self.mod_download_sleep(remote_ratio)
 
 		# Creaating path of local file about to be transferred
-		file_path = self.folder_path + "/" + file_name
+		# file_path = self.folder_path + "/" + file_name
 
-		if os.path.exists(file_path):
+		file_name = self.mod_hash_check_file(given_hash)
+
+		if file_name != False:
+			file_path = self.folder_path + "/" + file_name
+
 			with open(file_path, "rb") as handle:
 				bin_data = xmlrpclib.Binary(handle.read())
 
@@ -163,17 +188,39 @@ class collab_system:
 		##print "Sleep Time : %d" % self.mod_calc_sleep_time(ratio)
 		time.sleep(self.mod_download_calc_sleep(ratio))
 
-	# These functions are used in both frontend and backend
+	# Hashing related functions
 
-	def mod_hash(self, given_str, search_space):
+	def mod_file_list_append(self, file_name):
+		"""Appending file name and hashed file name to file dictionary"""
+
+		hash_digest = self.mod_hash_string(file_name)
+
+		self.file_dict[hash_digest] = file_name
+
+	def mod_hash_string(self, given_str):
+		"""A hashing function which hashes according to a predefined key space"""
+
 		hash_digest = hashlib.sha1()
 		hash_digest.update(given_str)
-		return int(hash_digest.hexdigest(),16) % search_space
+
+		return hash_digest.hexdigest()
+
+	def mod_hash_check_file(self, given_hash):
+		""""""
+
+		if self.file_dict.has_key(given_hash) == True:
+			return self.file_dict[given_hash]
+
+		else:
+			return False
 
 def main():
 	# Details of current node
 	local_ip = "localhost"
 	local_port = sys.argv[1]
+
+	# Creating the local object
+	local_node = collab_system(local_ip, local_port)
 
 	# Declared an XMLRPC server
 	# This is the listener part of the application
@@ -183,7 +230,7 @@ def main():
 
 	local_listener.register_introspection_functions()
 	local_listener.register_multicall_functions()
-	local_listener.register_instance(collab_system(local_ip, local_port))
+	local_listener.register_instance(local_node)
 
 	# Initialized the XMLRPC server in a seperate thread
 	server_thread = threading.Thread(target = local_listener.serve_forever)
@@ -202,9 +249,6 @@ def main():
 	# Creating connection details of remote node
 	remote_proxy = xmlrpclib.ServerProxy("http://" + remote_ip + ":" + remote_port + "/")
 
-	# Creating the local object
-	local_node = collab_system(local_ip, local_port)
-
 	# Creating the folder which will contain all uploads and downloads
 	os.makedirs(local_node.folder_path)
 
@@ -212,10 +256,10 @@ def main():
 		os.system('clear')
 
 		print "\n\n\t. : Collab Menu for %s : .\n" % local_port
-		print "\tSearch & download 		...[1]"
-		print "\tUpload            		...[2]"
-		print "\tAdmin Menu        		...[3]"
-		print "\tExit              		...[0]"
+		print "\tSearch & download      ...[1]"
+		print "\tUpload                 ...[2]"
+		print "\tAdmin Menu             ...[3]"
+		print "\tExit                   ...[0]"
 
 		input_val = raw_input("\n\n\tEnter option : ")
 
@@ -251,12 +295,12 @@ def main():
 				os.system('clear')
 
 				print "\n\n\t. : Admin Menu for %s : .\n" % local_port
-				print "\tSee finger table  		...[1]"
-				print "\tSee local files   		...[2]"
-				print "\tSee query cache  		...[3]"
-				print "\tSee neighbours    		...[4]"
-				print "\tSee statistics    		...[5]"
-				print "\t<< Back <<            		...[0]"
+				print "\tSee finger table       ...[1]"
+				print "\tSee local files        ...[2]"
+				print "\tSee query cache        ...[3]"
+				print "\tSee neighbours         ...[4]"
+				print "\tSee statistics         ...[5]"
+				print "\t<< Back <<             ...[0]"
 
 				admin_inp_val = raw_input("\n\n\tEnter option : ")
 
@@ -264,6 +308,7 @@ def main():
 					local_node.return_pause()
 
 				elif admin_inp_val == "2":
+
 					file_list = local_node.mod_show_files()
 
 					if file_list:

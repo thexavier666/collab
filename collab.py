@@ -18,13 +18,13 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 class collab_system:
 
 	def __init__(self, local_ip, local_port):
-		self.local_ip 		= local_ip
-		self.local_port 	= local_port
-		self.upload_amt 	= 1
-		self.download_amt 	= 1
-		self.ratio 			= 1
-		self.folder_path 	= "collab" + "_" + local_ip + "_" + local_port
-		self.file_dict		= {}
+		self.local_ip       = local_ip
+		self.local_port     = local_port
+		self.upload_amt     = 1
+		self.download_amt   = 1
+		self.ratio          = 1
+		self.folder_path    = "collab" + "_" + local_ip + "_" + local_port
+		self.file_dict      = {}
 
 	# These functions are used in the frontend
 
@@ -101,7 +101,7 @@ class collab_system:
 				handle.write(bin_data.data)
 
 			# Adding the file name to the hashed list of files
-			self.mod_file_list_append(file_name)		
+			self.mod_file_dict_append(file_name)		
 
 			return True
 		else:
@@ -190,7 +190,7 @@ class collab_system:
 
 	# Hashing related functions
 
-	def mod_file_list_append(self, file_name):
+	def mod_file_dict_append(self, file_name):
 		"""Appending file name and hashed file name to file dictionary"""
 
 		hash_digest = self.mod_hash_string(file_name)
@@ -206,7 +206,7 @@ class collab_system:
 		return hash_digest.hexdigest()
 
 	def mod_hash_check_file(self, given_hash):
-		""""""
+		"""A function which checks if a file is present in the hash list"""
 
 		if self.file_dict.has_key(given_hash) == True:
 			return self.file_dict[given_hash]

@@ -115,12 +115,12 @@ class collab_system:
 
 		self.mod_download_sleep(remote_ratio)
 
-		# Creaating path of local file about to be transferred
-		# file_path = self.folder_path + "/" + file_name
-
+		# Checking if the file name hash actually exists
 		file_name = self.mod_hash_check_file(given_hash)
 
 		if file_name != False:
+
+			# Creaating path of local file about to be transferred
 			file_path = self.folder_path + "/" + file_name
 
 			with open(file_path, "rb") as handle:
@@ -154,39 +154,36 @@ class collab_system:
 		with open(new_file_name, "wb") as handle:
 			handle.write(bin_data.data)
 
-		self.mod_update_ratio()
-
 		return True
 
-	def mod_download_calc_sleep(self, ratio):
-		"""Calculates the sleep time according to ratio"""
+	def mod_download_sleep(self, ratio):
+		"""A function which delays the download according to the upload/download ratio"""
 
-		# Ratio infinite or or greater than 1
+		sleep_time = 0
+
+		# Ratio greater than 1
 		if ratio > 1:
-			return 0
+			sleep_time = 0
 
 		# No download or upload done yet or ratio is exactly 1
 		elif ratio == 1:
-			return config.SLEEP_TIME_LEVEL_DEF()
+			sleep_time = config.SLEEP_TIME_LEVEL_DEF()
 
 		# Ratio is less than 1
 		elif ratio >= 0.1 and ratio < 1:
-			return config.SLEEP_TIME_LEVEL_1()
+			sleep_time = config.SLEEP_TIME_LEVEL_1()
 
 		elif ratio >= 0.01 and ratio < 0.1:
-			return config.SLEEP_TIME_LEVEL_2()
+			sleep_time = config.SLEEP_TIME_LEVEL_2()
 
 		elif ratio >= 0.001 and ratio < 0.01:
-			return config.SLEEP_TIME_LEVEL_3()
+			sleep_time = config.SLEEP_TIME_LEVEL_3()
 
 		else:
-			return config.SLEEP_TIME_LEVEL_4()
-
-	def mod_download_sleep(self, ratio):
-		"""A function which delays the download according to the ratio"""
+			sleep_time = config.SLEEP_TIME_LEVEL_4()
 
 		##print "Sleep Time : %d" % self.mod_calc_sleep_time(ratio)
-		time.sleep(self.mod_download_calc_sleep(ratio))
+		time.sleep(sleep_time)
 
 	# Hashing related functions
 
@@ -224,7 +221,7 @@ def main():
 
 	# Declared an XMLRPC server
 	# This is the listener part of the application
-	local_listener = SimpleXMLRPCServer((local_ip, int(local_port)), allow_none = True)
+	local_listener = SimpleXMLRPCServer((local_ip, int(local_port)), logRequests = False, allow_none = True)
 	
 	##print "[Listening on port : %s]" % local_port
 

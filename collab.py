@@ -4,27 +4,45 @@
 # All comments starting with '##' are used for debugging purpose
 # Disable the comments to see whether the modules are firing or not
 
-import sys
-import xmlrpclib
-import os
-import threading
-import time
-import hashlib
+import sys        # For argument list
+import xmlrpclib  # For XMLRPC
+import os         # For making directories
+import threading  # For running the server in the background
+import time       # For calling the sleep function
+import hashlib    # For hashing node addresses & file names
 
-import config
+import config     # For using constants
 
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 class collab_system:
 
 	def __init__(self, local_ip, local_port):
+		# IP of the current machine
 		self.local_ip       = local_ip
+
+		# Port number at which the process is running
 		self.local_port     = local_port
+
+		# Amount of data uploaded by the current node (in bytes)
 		self.upload_amt     = 1
+
+		# Amounf of data downloaded by the current node (in bytes)
 		self.download_amt   = 1
+
+		# The ratio of the upload data to the downloaded data
 		self.ratio          = 1
-		self.folder_path    = "collab" + "_" + local_ip + "_" + local_port
+
+		# Path of the files which are hosted by the current node
+		self.dir_hosted     = "collab_hosted" + "_" + local_ip + "_" + local_port
+
+		# Path of the files which have been downloaded by the current node
+		self.dir_downloaded = "collab_downloaded" + "_" + local_ip + "_" + local_port
+
+		# A data structure which contains a list of file names
+		# which are hosted by the current node and their hashed equiv
 		self.file_dict      = {}
+
 
 	# These functions are used in the frontend
 
@@ -95,7 +113,7 @@ class collab_system:
 		# File not present in node, thus upload can proceed
 		if self.mod_hash_check_file(self.mod_hash_string(file_name)) == False:
 
-			new_file_name = self.folder_path + "/" + file_name
+			new_file_name = self.dir_hosted + "/" + file_name
 
 			with open(new_file_name, "wb") as handle:
 				handle.write(bin_data.data)
@@ -120,8 +138,8 @@ class collab_system:
 
 		if file_name != False:
 
-			# Creaating path of local file about to be transferred
-			file_path = self.folder_path + "/" + file_name
+			# Creating path of local file about to be transferred
+			file_path = self.dir_hosted + "/" + file_name
 
 			with open(file_path, "rb") as handle:
 				bin_data = xmlrpclib.Binary(handle.read())
@@ -149,7 +167,7 @@ class collab_system:
 
 		##print "[mod_file_download_receive fired]"
 
-		new_file_name = "./" + file_name
+		new_file_name = self.dir_downloaded + "/" + file_name
 
 		with open(new_file_name, "wb") as handle:
 			handle.write(bin_data.data)
@@ -246,8 +264,11 @@ def main():
 	# Creating connection details of remote node
 	remote_proxy = xmlrpclib.ServerProxy("http://" + remote_ip + ":" + remote_port + "/")
 
-	# Creating the folder which will contain all uploads and downloads
-	os.makedirs(local_node.folder_path)
+	# Creating the directory which will contain all hosted files
+	os.makedirs(local_node.dir_hosted)
+
+	# Creating the directory which will contain all downloaded files
+	os.makedirs(local_node.dir_downloaded)
 
 	while True:
 		os.system('clear')

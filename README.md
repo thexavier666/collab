@@ -20,11 +20,13 @@ An Incentive Based P2P Distributed File Storage System
 * Added more comments to the constructor and the import section
 * Downloads now take place in separate folders
 * Updated README files with individual responsibilities
+* Added a shell script which will delete all folders created due to the system
 
 ### How to run Collab
 * Run the following command for each node
 * `python collab.py port_number`
 * Inside the application, enter remote port as the port ID of the other node. Currently, the system supports pair wise connections
+* After running the application and exiting it, run the shell script `del.sh`
 
 ### To do (Sumitro)
 * [ ] Add support to work from another machine (very easy)

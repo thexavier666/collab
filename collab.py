@@ -218,7 +218,7 @@ class collab_system:
 		hash_digest = hashlib.sha1()
 		hash_digest.update(given_str)
 
-		return hash_digest.hexdigest()
+		return int(hash_digest.hexdigest(),16) % config.KEY_SPACE()
 
 	def mod_hash_check_file(self, given_hash):
 		"""A function which checks if a file is present in the hash list"""

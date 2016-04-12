@@ -1,19 +1,20 @@
 # Key space
 def KEY_SPACE():
-	return 1000000000
+	# 1 trillion
+	return 1000000000000
 
-# Cache
+# Cache (In seconds)
 def DEF_CACHE_SIZE():
 	return 50
 
 def DEF_CACHE_TIMEOUT():
 	return 120
 
-# Probing
+# Probing (In seconds)
 def DEF_PROBE_TIME():
 	return 10
 
-# Sleep times
+# Sleep times (In seconds)
 def SLEEP_TIME_LEVEL_DEF():
 	return 1
 
@@ -28,4 +29,3 @@ def SLEEP_TIME_LEVEL_3():
 
 def SLEEP_TIME_LEVEL_4():
         return 5
-

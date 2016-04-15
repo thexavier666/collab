@@ -43,13 +43,22 @@ class collab_system:
 		# which are hosted by the current node and their hashed equiv
 		self.file_dict      = {}
 
+#----------------- Suman --------------------------------------------------------------
+		##print "INIT Function"
+		self.local_address  =  local_ip + ":" + local_port
+
+		self.pred_pred 		=  local_ip + ":" + local_port
+		self.pred          	=  local_ip + ":" + local_port
+		self.succ  			=  local_ip + ":" + local_port
+		self.succ_succ		=  local_ip + ":" + local_port
+#----------------- Suman -----------------------------------------------------------------
 
 	# These functions are used in the frontend
 
 	def return_pause(self):
 		"""Used for creating a pause during input"""
 
-		raw_input("\n\tPress enter to continue")
+		raw_input("\n\tPress enter to continue ... ")
 
 		return True
 
@@ -229,6 +238,274 @@ class collab_system:
 		else:
 			return False
 
+#----------------- Suman -------------------------------------------------------------------------
+#----------------- call this function to get the finger table ------------------------------------
+	def mod_get_finger_table(self):
+		finger_table = {'pred_pred':self.pred_pred,'pred':self.pred,'succ':self.succ,'succ_succ':self.succ_succ}
+		return finger_table
+		
+#----------------- call this function to get own hash value --------------------------------------
+	def mod_get_own_hash(self):
+		return int(self.mod_hash_string(self.local_address))
+		
+#----------------- call this function to get successor hash value --------------------------------
+	def mod_get_succ_hash(self):
+		return int(self.mod_hash_string(self.succ))
+		
+#----------------- call this function to get succ's succ hash value ------------------------------
+	def mod_get_succ_succ_hash(self):
+		return int(self.mod_hash_string(self.succ_succ))
+		
+#----------------- call this function to get pred hash value -------------------------------------
+	def mod_get_pred_hash(self):
+		return int(self.mod_hash_string(self.pred))
+		
+#----------------- call this function to get pred's pred hash value ------------------------------
+	def mod_get_pred_pred_hash(self):
+		return int(self.mod_hash_string(self.pred_pred))
+		
+#----------------- after own join pre_succ_table_stabilization ----------------------PRINT--------
+	def pre_succ_table_stabilization(self,local_pre_succ_table):
+		if int(self.mod_hash_string(self.succ)) != int(self.mod_hash_string(self.local_address)):
+			#print "mod_join_update_table_succ"
+
+			succ_add 		= (local_pre_succ_table['succ']).split(":")
+			remote_proxy2 	= xmlrpclib.ServerProxy("http://" + str(succ_add[0]) + ":" + str(succ_add[1]) + "/")
+			ll 				= remote_proxy2.mod_join_update_table_succ(self.local_address,local_pre_succ_table)
+
+		if int(self.mod_hash_string(self.succ_succ)) != int(self.mod_hash_string(self.local_address)):
+			#print "mod_join_update_table_succ_succ"
+
+			succ_add 		= (local_pre_succ_table['succ_succ']).split(":")
+			remote_proxy2 	= xmlrpclib.ServerProxy("http://" + str(succ_add[0]) + ":" + str(succ_add[1]) + "/")
+			ll 				= remote_proxy2.mod_join_update_table_succ_succ(self.local_address,local_pre_succ_table)
+
+		if int(self.mod_hash_string(self.pred)) != int(self.mod_hash_string(self.local_address)):
+			#print "mod_join_update_table_pred"
+
+			pred_add 		= (local_pre_succ_table['pred_pred']).split(":")
+			remote_proxy2 	= xmlrpclib.ServerProxy("http://" + str(pred_add[0]) + ":" + str(pred_add[1]) + "/")
+			ll 				= remote_proxy2.mod_join_update_table_pred(self.local_address,local_pre_succ_table)
+
+		return "DONE"
+#-------------------------------------------------------------------------------------------------
+#----------------- successor table updation -----------------------------------------PRINT--------
+	def mod_join_update_table_succ(self,remote_address,remote_address_table):
+		self.pred 		= remote_address
+		self.pred_pred 	= remote_address_table['pred']
+
+		if self.succ == remote_address_table['pred']:
+			self.succ_succ = remote_address
+
+		##print self.local_address,self.pred_pred,self.pred,self.succ,self.succ_succ
+
+		return True
+#-------------------------------------------------------------------------------------------------
+#----------------- successor's successor table updation -----------------------------PRINT--------
+	def mod_join_update_table_succ_succ(self,remote_address,remote_address_table):
+		self.pred_pred 	= remote_address
+
+		if self.succ == remote_address_table['pred']:
+			self.succ_succ = remote_address		
+
+		##print self.local_address,self.pred_pred,self.pred,self.succ,self.succ_succ
+
+		return True
+#-------------------------------------------------------------------------------------------------
+#----------------- predeccesor table updation ---------------------------------------PRINT--------
+	def mod_join_update_table_pred(self,remote_address,remote_address_table):
+		self.succ_succ 	= remote_address
+
+		if self.pred == remote_address_table['succ']:
+			self.pred_pred = remote_address
+
+		##print self.local_address,self.pred_pred,self.pred,self.succ,self.succ_succ
+
+		return True
+#-------------------------------------------------------------------------------------------------
+#----------------- update own information table -------------------------------------PRINT--------
+	def own_update(self,own_succ_pre_table_update):
+		self.pred 		= own_succ_pre_table_update['pred']
+		self.pred_pred 	= own_succ_pre_table_update['pred_pred']
+		self.succ 		= own_succ_pre_table_update['succ']
+		self.succ_succ 	= own_succ_pre_table_update['succ_succ']
+
+		##print "own_update end",self.pred_pred,self.pred,self.succ,self.succ_succ
+
+		return True	
+#-------------------------------------------------------------------------------------------------
+#----------------- node join receive module ------------- (Main module)---------------------------
+	def mod_join_recv(self,remote_address):
+		##print "Received::, remote_address
+
+		remote_succ_pred = {'pred_pred':self.local_address,'pred':self.local_address,'succ':self.local_address,'succ_succ':self.local_address}
+
+		##print self.local_address, type(self.local_address)
+		##print self.succ, type(self.succ)
+		##print self.pred,type(self.pred) 
+
+		#------------------------- if there is only a single node in the system -------------------------------------------
+		if int(self.mod_hash_string(self.succ)) == int(self.mod_hash_string(self.local_address)) and int(self.mod_hash_string(self.pred)) == int(self.mod_hash_string(self.local_address)):
+
+			if int(self.mod_hash_string(self.local_address)) > int(self.mod_hash_string(remote_address)):
+				#print "local port:",type(self.local_port),"remote_address:",type(remote_address)
+				##print "localport > remote port"
+
+				self.pred 		= remote_address
+				self.pred_pred 	= self.local_address
+				self.succ 		= remote_address
+				self.succ_succ 	= self.local_address
+
+				remote_succ_pred['pred'] 		= self.local_address
+				remote_succ_pred['pred_pred'] 	= remote_address
+				remote_succ_pred['succ'] 		= self.local_address
+				remote_succ_pred['succ_succ'] 	= remote_address
+
+			elif int(self.mod_hash_string(self.local_address)) < int(self.mod_hash_string(remote_address)):
+				#print "local port:",type(self.local_port),"remote_address:",type(remote_address)
+				##print "locaport < remote port"
+
+				self.pred 		= remote_address
+				self.pred_pred 	= self.local_address
+				self.succ 		= remote_address
+				self.succ_succ 	= self.local_address
+
+				remote_succ_pred['pred'] 		= self.local_address
+				remote_succ_pred['pred_pred'] 	= remote_address
+				remote_succ_pred['succ'] 		= self.local_address
+				remote_succ_pred['succ_succ'] 	= remote_address
+
+			##print self.pred_pred,self.pred,self.succ,self.succ_succ
+
+			return remote_succ_pred
+		#------------------------------------------------------------------------------------------------------------------
+
+		#---------------------------- if more than one node in the system -------------------------------------------------
+		else:
+		#---------------------------- if the node is the left most node ---------------------------------------------------
+			if (int(self.mod_hash_string(self.pred)) > int(self.mod_hash_string(self.local_address))) and (int(self.mod_hash_string(self.succ)) > int(self.mod_hash_string(self.local_address))) :
+				##print "edge case 1"
+
+				if (int(self.mod_hash_string(remote_address)) > int(self.mod_hash_string(self.local_address))) and (int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.succ))) :
+					##print remote_address,"lies between me and my succssor"
+
+					remote_succ_pred['pred'] 		= self.local_address
+					remote_succ_pred['pred_pred'] 	= self.pred
+					remote_succ_pred['succ'] 		=  self.succ
+					remote_succ_pred['succ_succ'] 	= self.succ_succ
+
+					if int(self.mod_hash_string(self.pred)) == int(self.mod_hash_string(remote_succ_pred['succ'])):
+						self.pred_pred = remote_address
+
+					self.succ 		= remote_address
+					self.succ_succ 	= remote_succ_pred['succ']
+
+				elif int(self.mod_hash_string(remote_address)) > int(self.mod_hash_string(self.succ)):
+					##print remote_address,"greater than my succsseor"
+
+					succ_add 			= (self.succ).split(":")
+					remote_proxy2 		= xmlrpclib.ServerProxy("http://" + str(succ_add[0]) + ":" + str(succ_add[1]) + "/")
+					ll 					= remote_proxy2.mod_join_recv(remote_address)
+					remote_succ_pred 	= ll
+
+				elif int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.local_address)):
+					##print remote_address,"less than mine"
+					pred_add 			= (self.pred).split(":")
+					remote_proxy2 		= xmlrpclib.ServerProxy("http://" + str(pred_add[0]) + ":" + str(pred_add[1]) + "/")
+					ll 					= remote_proxy2.mod_join_recv(remote_address)
+					remote_succ_pred 	= ll
+
+				##print self.pred_pred,self.pred,self.succ,self.succ_succ
+
+				return remote_succ_pred
+			#---------------------------- if the node is the right most node ----------------------------------------------
+			elif int(self.mod_hash_string(self.pred)) < int(self.mod_hash_string(self.local_address)) and int(self.mod_hash_string(self.succ)) < int(self.mod_hash_string(self.local_address)):
+				##print "edge case 2"
+					
+				if( int(self.mod_hash_string(remote_address)) > int(self.mod_hash_string(self.local_address))) or ((int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.local_address))) and (int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.succ)))):
+					##print remote_address,"greater than mine or less than mine and my succ"
+
+					remote_succ_pred['pred'] 		= self.local_address
+					remote_succ_pred['pred_pred'] 	= self.pred
+					remote_succ_pred['succ'] 		= self.succ
+					remote_succ_pred['succ_succ'] 	= self.succ_succ
+
+					if int(self.mod_hash_string(self.pred)) == int(self.mod_hash_string(remote_succ_pred['succ'])):
+						self.pred_pred = remote_address
+
+					self.succ 		= remote_address
+					self.succ_succ 	= remote_succ_pred['succ']
+					##print self.pred_pred,self.pred,self.succ,self.succ_succ
+
+				elif (int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.local_address))):
+					##print remote_address,"less than mine"
+
+					pred_add 			= (self.pred).split(":")
+					remote_proxy2 		= xmlrpclib.ServerProxy("http://" + str(pred_add[0]) + ":" + str(pred_add[1]) + "/")
+					ll 					= remote_proxy2.mod_join_recv(remote_address)
+					remote_succ_pred 	= ll
+
+				return remote_succ_pred
+			#---------------------------- if the node is the intermediate node --------------------------------------------
+			else:
+				##print "Main case"
+
+				if (int(self.mod_hash_string(remote_address)) > int(self.mod_hash_string(self.local_address)) and int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.succ)) ):
+					##print remote_address,"lies between me and my succssor"
+
+					remote_succ_pred['pred'] 		= self.local_address
+					remote_succ_pred['pred_pred'] 	= self.pred
+					remote_succ_pred['succ'] 		=  self.succ
+					remote_succ_pred['succ_succ'] 	= self.succ_succ
+
+					if int(self.mod_hash_string(self.pred)) == int(self.mod_hash_string(remote_succ_pred['succ'])):
+						self.pred_pred = remote_address
+
+					self.succ 		= remote_address
+					self.succ_succ 	= remote_succ_pred['succ']
+
+				elif int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.local_address)):
+					##print remote_address,"less than mine"
+
+					pred_add 			= (self.pred).split(":")
+					remote_proxy2 		= xmlrpclib.ServerProxy("http://" + str(pred_add[0]) + ":" + str(pred_add[1]) + "/")
+					ll 					= remote_proxy2.mod_join_recv(remote_address)
+					remote_succ_pred 	= ll
+
+				elif int(self.mod_hash_string(remote_address)) > int(self.mod_hash_string(self.succ)):
+					##print remote_address,"greater than my succssor"
+
+					succ_add 			= (self.succ).split(":")
+					remote_proxy2 		= xmlrpclib.ServerProxy("http://" + str(succ_add[0]) + ":" + str(succ_add[1]) + "/")
+					ll 					= remote_proxy2.mod_join_recv(remote_address)
+					remote_succ_pred 	= ll
+
+				##print self.pred_pred,self.pred,self.succ,self.succ_succ
+				return remote_succ_pred
+
+#----------------- node requesting for join -----------------------------------------PRINT--------
+	def mod_join_req(self,master_ip,master_port):
+		remote_proxy1 = xmlrpclib.ServerProxy("http://" + str(master_ip) + ":" + str(master_port) + "/")
+
+		#local_address = self.local_ip+":"+self.local_port
+		##print self.local_address," HASH ", int(self.mod_hash_string(self.local_address))
+
+		pp = remote_proxy1.mod_join_recv(self.local_address)
+
+		self.pred 		= pp['pred']
+		self.pred_pred 	= pp['pred_pred']
+		self.succ 		= pp['succ']
+		self.succ_succ 	= pp['succ_succ']
+
+		#remote_proxy2 = xmlrpclib.ServerProxy("http://" + self.local_ip + ":" + str(self.local_port) + "/")
+		#kk = remote_proxy2.own_update(pp)
+		##print "Node join req end",self.pred_pred,self.pred,self.succ,self.succ_succ
+
+		mm = self.pre_succ_table_stabilization(pp)
+
+		return mm				
+#----------------- Suman -------------------------------------------------------------------------
+
 def main():
 	# Details of current node
 	local_ip = "localhost"
@@ -257,12 +534,17 @@ def main():
 	# Starting the server thread
 	server_thread.start()
 
-	# Details of remote node
-	remote_ip = "localhost"
-	remote_port = raw_input("\n\tEnter remote port ID : ")
+	if len(sys.argv) == 3:
+		# Details of master node
+		master_ip 	= "localhost"
+		master_port = sys.argv[2]
+
+		pred_succ 	= local_node.mod_join_req(master_ip,master_port)
+
+		##print pred_succ
 
 	# Creating connection details of remote node
-	remote_proxy = xmlrpclib.ServerProxy("http://" + remote_ip + ":" + remote_port + "/")
+	# remote_proxy = xmlrpclib.ServerProxy("http://" + remote_ip + ":" + remote_port + "/")
 
 	# Creating the directory which will contain all hosted files
 	os.makedirs(local_node.dir_hosted)
@@ -270,10 +552,15 @@ def main():
 	# Creating the directory which will contain all downloaded files
 	os.makedirs(local_node.dir_downloaded)
 
+	# local_node.return_pause()
+
 	while True:
 		os.system('clear')
 
 		print "\n\n\t. : Collab Menu for %s : .\n" % local_port
+
+		print "\t|HASH VALUE| : %d\n" % local_node.mod_hash_string(local_node.local_address) 
+
 		print "\tSearch & download      ...[1]"
 		print "\tUpload                 ...[2]"
 		print "\tAdmin Menu             ...[3]"
@@ -288,6 +575,7 @@ def main():
 
 			if file_lookup == False:
 				print "\n\tFile not found at remote node!"
+
 			else:
 				print "\n\tFile downloaded!"
 
@@ -313,16 +601,25 @@ def main():
 				os.system('clear')
 
 				print "\n\n\t. : Admin Menu for %s : .\n" % local_port
+
+				print "\t|HASH VALUE| : %d\n" % local_node.mod_hash_string(local_node.local_address) 
+
 				print "\tSee finger table       ...[1]"
 				print "\tSee local files        ...[2]"
 				print "\tSee query cache        ...[3]"
-				print "\tSee neighbours         ...[4]"
-				print "\tSee statistics         ...[5]"
+				print "\tSee statistics         ...[4]"
 				print "\t<< Back <<             ...[0]"
 
 				admin_inp_val = raw_input("\n\n\tEnter option : ")
 
 				if admin_inp_val == "1":
+					print "\n\n\t. : Finger Table : .\n"
+
+					print "\t\tPredecessor's predeccesor : ", local_node.pred_pred 
+					print "\t\tPredecessor               : ", local_node.pred
+					print "\t\tSuccessor                 : ", local_node.succ
+					print "\t\tSuccessor's successor     : ", local_node.succ_succ
+
 					local_node.return_pause()
 
 				elif admin_inp_val == "2":
@@ -343,9 +640,6 @@ def main():
 					local_node.return_pause()
 
 				elif admin_inp_val == "4":
-					local_node.return_pause()
-
-				elif admin_inp_val == "5":
 					local_node.mod_show_stats()
 					local_node.return_pause()
 

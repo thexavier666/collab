@@ -24,7 +24,7 @@ An Incentive Based P2P Distributed File Storage System
 * Downloads now take place in separate folders
 * Updated README files with individual responsibilities
 * Added a shell script which will delete all folders created due to the system
-* Huge update from Suman
+* Huge update from Suman. I made some purely cosmetic changes to Suman's code
 
 ### How to start the Collab system
 * Run the following command for each node

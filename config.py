@@ -1,7 +1,8 @@
 # Key space
 def KEY_SPACE():
-	# 1 trillion
-	return 1000000000000
+	# 1 trillion is default
+	# currently using 10000
+	return 10000
 
 # Cache (In seconds)
 def DEF_CACHE_SIZE():

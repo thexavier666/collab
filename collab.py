@@ -811,7 +811,7 @@ class collab_system:
 		elif file_hash < self.mod_get_pred_hash() and self.mod_get_own_hash() != self.mod_get_pred_hash():
 			remote_proxy1 = xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_pred_hash())[0]+ ":" + self.mod_get_address(self.mod_get_pred_hash())[1] + "/")
 
-			print remote_proxy1
+			###print remote_proxy1
 
 			actual_list = remote_proxy1.mod_rpc_upload( int(file_hash) )
 			actual_ip 	= actual_list[0]
@@ -820,7 +820,7 @@ class collab_system:
 		elif file_hash >= self.mod_get_own_hash() and self.mod_get_own_hash() != self.mod_get_succ_hash():
 			remote_proxy1 = xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_succ_hash())[0] + ":" + self.mod_get_address(self.mod_get_succ_hash())[1] + "/")
 
-			print remote_proxy1
+			###print remote_proxy1
 
 			actual_list	= remote_proxy1.mod_rpc_upload( int(file_hash) )
 			actual_ip	= actual_list[0]
@@ -835,7 +835,7 @@ class collab_system:
 		
 		file_hash = self.mod_hash_string(file_name)	
 		
-		print self.mod_get_address(self.mod_get_succ_hash())[0] , ":" , self.mod_get_address(self.mod_get_succ_hash())[1]
+		###print self.mod_get_address(self.mod_get_succ_hash())[0] , ":" , self.mod_get_address(self.mod_get_succ_hash())[1]
 
 		if (file_hash < self.mod_get_own_hash() or file_hash > self.mod_get_pred_hash()) and self.mod_get_own_hash() < self.mod_get_pred_hash() and self.mod_get_own_hash() < self.mod_get_succ_hash():
 			actual_ip	= self.mod_get_address( self.mod_get_own_hash() )[0]
@@ -850,7 +850,7 @@ class collab_system:
 		elif file_hash < self.mod_get_pred_hash() and self.mod_get_own_hash() != self.mod_get_pred_hash():
 			remote_proxy1 = xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_pred_hash())[0]+ ":" + self.mod_get_address(self.mod_get_pred_hash())[1] + "/")
 			
-			print remote_proxy1
+			###print remote_proxy1
 
 			actual_list = remote_proxy1.mod_rpc_upload( int(file_hash) )
 			actual_ip 	= actual_list[0]
@@ -859,7 +859,7 @@ class collab_system:
 		elif file_hash >= self.mod_get_own_hash() and self.mod_get_own_hash() != self.mod_get_succ_hash():
 			remote_proxy1 = xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_succ_hash())[0] + ":" + self.mod_get_address(self.mod_get_succ_hash())[1] + "/")
 
-			print remote_proxy1
+			###print remote_proxy1
 
 			actual_list	= remote_proxy1.mod_rpc_upload( int(file_hash) )
 			actual_ip	= actual_list[0]

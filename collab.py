@@ -737,18 +737,24 @@ class collab_system:
 					actual_port	= 0
 
 			elif file_hash < self.mod_get_pred_hash() and self.mod_get_own_hash() != self.mod_get_pred_hash():
-				remote_proxy1 	= xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_pred_hash())[0]+ ":" + self.mod_get_address(self.mod_get_pred_hash())[1] + "/")
-				actual_list		= remote_proxy1.mod_rpc_search(file_hash)
+				try:
+					remote_proxy1 	= xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_pred_hash())[0]+ ":" + self.mod_get_address(self.mod_get_pred_hash())[1] + "/")
+					actual_list		= remote_proxy1.mod_rpc_search(file_hash)
 
-				actual_ip		= actual_list[0]
-				actual_port		= actual_list[1]
+					actual_ip		= actual_list[0]
+					actual_port		= actual_list[1]
+				except:
+					print "\t\t\nNode not present ... \n"
 
 			elif file_hash >= self.mod_get_own_hash() and self.mod_get_own_hash() != self.mod_get_succ_hash():
-				remote_proxy1 	= xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_succ_hash())[0] + ":" + self.mod_get_address(self.mod_get_succ_hash())[1] + "/")
-				actual_list		= remote_proxy1.mod_rpc_search(file_hash)
+				try:
+					remote_proxy1 	= xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_succ_hash())[0] + ":" + self.mod_get_address(self.mod_get_succ_hash())[1] + "/")
+					actual_list		= remote_proxy1.mod_rpc_search(file_hash)
 
-				actual_ip		= actual_list[0]
-				actual_port		= actual_list[1]
+					actual_ip		= actual_list[0]
+					actual_port		= actual_list[1]
+				except:
+					print "\t\t\nNode not present ... \n"
 
 		#---------- Downloading File-----------------------------------------------------------
 		if actual_ip == 0 and actual_port == 0:
@@ -784,14 +790,18 @@ class collab_system:
 					return -1
 
 			else:
-				remote_proxy1 = xmlrpclib.ServerProxy("http://" + actual_ip + ":" + actual_port + "/")
-				download_file_size = remote_proxy1.mod_file_download_transfer(file_hash, self.local_ip, self.local_port, self.ratio)
+				try:
+					remote_proxy1 = xmlrpclib.ServerProxy("http://" + actual_ip + ":" + actual_port + "/")
+					download_file_size = remote_proxy1.mod_file_download_transfer(file_hash, self.local_ip, self.local_port, self.ratio)
 
-		self.download_amt = self.download_amt + download_file_size
+					self.download_amt = self.download_amt + download_file_size
 
-		self.mod_update_ratio()
+					self.mod_update_ratio()
 
-		self.mod_cache_update(file_hash, actual_ip, actual_port)
+					self.mod_cache_update(file_hash, actual_ip, actual_port)
+
+				except:
+					print "\t\t\nNode not present ... \n"
 
 		return True
 

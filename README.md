@@ -1,14 +1,22 @@
 # collab
-An Incentive Based P2P Distributed File Storage System
+An Incentive Based Self Stabilizing P2P File Storage System. Developed by a team from IIT Kharagpur as a term project for the subject 'Distributed Systems' during the Spring 2016 session
 
-### Current features
-* Can connect to another node but in the same machine
+### Developers
+* Suman Mondal
+* Sourav Bhattacharjee
+* Midhun George
+* Sumitro Bhaumik
+
+### Features
+* Nodes join together in the shape of a ring
+* The ring can tolerate upto 1 fault
 * Can upload and download files from each other
-* Can view list of files which are hosted by the current node
+* Current node can view list of files which are hosted by itself
+* Current node can view list of files which are downloaded by itself
 * Incentive and penalty based on upload to download ratio
-* Multiple nodes can now be added in the shape of a ring
 * Any node can be leader
 * Redundant links in both forward and backward directions
+* An implementation of cached queries so that repeat queries are processed faster
 
 ### Changelog
 * Added a hash function which takes a string and a key space as input and returns a number. Key space is defined in the config file
@@ -28,15 +36,13 @@ An Incentive Based P2P Distributed File Storage System
 
 ### How to start the Collab system
 * Run the following command for each node
-* `python collab.py own_port_number` for the first node
-* `python collab.py own_port_number any_port_number`
-* ~~Inside the application, enter remote port as the port ID of the other node. Currently, the system supports pair wise connections~~
-* After running the application and exiting it, run the shell script `del.sh`
+* `python collab.py` for the first node
+* `python collab.py IP_ADDRESS` where `IP_ADDRESS` can be the IP of node which has already joined the system
 
 ### To do (Sumitro)
-* [ ] Add support to work from another machine (very easy)
-* [ ] Node stabilize
-* [ ] Integration
+* [x] Add support to work from another machine (very easy)
+* [x] Node stabilize
+* [x] Integration
 * [x] Kill the server running in the background nicely
 * [x] Integrate the hash function in the upload and download function
 * [x] Put the downloaded files in a separate folder so that these files are not hosted
@@ -48,13 +54,13 @@ An Incentive Based P2P Distributed File Storage System
 * [x] Node join with proper successor in the shape of a ring
 * [x] Node finger table
 * [x] Displaying the menu
-* [ ] Node leave
+* [x] Node leave
 
 ### To do (Midhun)
-* [ ] Global upload
-* [ ] Global search
-* [ ] Local search
+* [x] Global upload
+* [x] Global search
+* [x] Local search
 
 ### To do (Sourav)
-* [ ] Global search
-* [ ] Cache implementation
+* [x] Global search
+* [x] Cache implementation

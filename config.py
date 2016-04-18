@@ -1,3 +1,7 @@
+# System Port
+def SYS_PORT()
+	return 8000
+
 # Key space
 def KEY_SPACE():
 	# 1 trillion is default

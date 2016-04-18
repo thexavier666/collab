@@ -1,22 +1,15 @@
 # The Collab system consisting of the frontend and the backend
 
-# . : NOTE : .
-# All comments starting with '##' are used for debugging purpose
-# Disable the comments to see whether the modules are firing or not
-
 import sys        # For argument list
 import xmlrpclib  # For XMLRPC
 import os         # For making directories
 import threading  # For running the server in the background
 import time       # For calling the sleep function
 import hashlib    # For hashing node addresses & file names
-
-#----------------- Sourav --------------------------------------------------------------
 import Queue
 import thread
 import datetime
 import shutil
-#----------------- Sourav --------------------------------------------------------------
 
 import config     # For using constants
 
@@ -50,20 +43,16 @@ class collab_system:
 		# which are hosted by the current node and their hashed equiv
 		self.file_dict      = {}
 
-#----------------- Suman --------------------------------------------------------------
 		self.local_address  = local_ip + ":" + local_port
 
 		self.pred_pred 		= local_ip + ":" + local_port
 		self.pred          	= local_ip + ":" + local_port
 		self.succ  			= local_ip + ":" + local_port
 		self.succ_succ		= local_ip + ":" + local_port
-#----------------- Suman --------------------------------------------------------------
 
-#----------------- Sourav --------------------------------------------------------------
 		self.cache			= {}
 		self.q 				= Queue.Queue()
 		self.lock 			= thread.allocate_lock()
-#----------------- Sourav --------------------------------------------------------------
 
 	# These functions are used in the frontend
 
@@ -133,8 +122,6 @@ class collab_system:
 	def mod_file_upload_receive(self, bin_data, file_name):
 		"""Used to receive a file upon a request of an upload"""
 
-		##print "[mod_file_receive fired]"
-
 		# File not present in node, thus upload can proceed
 		if self.mod_hash_check_file(self.mod_hash_string(file_name)) == False:
 
@@ -153,8 +140,6 @@ class collab_system:
 
 	def mod_file_download_transfer(self, given_hash, remote_ip, remote_port, remote_ratio):
 		"""Initiating the file transfer"""
-
-		##print "[mod_file_transfer fired]"
 
 		self.mod_download_sleep(remote_ratio)
 
@@ -187,8 +172,6 @@ class collab_system:
 
 	def mod_file_download_receive(self, bin_data, file_name):
 		"""Used to receive a file upon request of a download"""
-
-		##print "[mod_file_download_receive fired]"
 
 		new_file_name = self.dir_downloaded + "/" + file_name
 
@@ -283,7 +266,6 @@ class collab_system:
 		else:
 			return False
 
-#----------------- Suman -------------------------------------------------------------------------
 #----------------- call this function to get the finger table ------------------------------------
 	def mod_get_finger_table(self):
 		finger_table = {'pred_pred':self.pred_pred,'pred':self.pred,'succ':self.succ,'succ_succ':self.succ_succ}
@@ -322,21 +304,18 @@ class collab_system:
 	def pre_succ_table_stabilization(self,local_pre_succ_table):
 
 		if int(self.mod_hash_string(self.succ)) != int(self.mod_hash_string(self.local_address)):
-			#print "mod_join_update_table_succ"
 
 			succ_add 		= (local_pre_succ_table['succ']).split(":")
 			remote_proxy2 	= xmlrpclib.ServerProxy("http://" + str(succ_add[0]) + ":" + str(succ_add[1]) + "/")
 			ll 				= remote_proxy2.mod_join_update_table_succ(self.local_address,local_pre_succ_table)
 
 		if int(self.mod_hash_string(self.succ_succ)) != int(self.mod_hash_string(self.local_address)):
-			#print "mod_join_update_table_succ_succ"
 
 			succ_add 		= (local_pre_succ_table['succ_succ']).split(":")
 			remote_proxy2 	= xmlrpclib.ServerProxy("http://" + str(succ_add[0]) + ":" + str(succ_add[1]) + "/")
 			ll 				= remote_proxy2.mod_join_update_table_succ_succ(self.local_address,local_pre_succ_table)
 
 		if int(self.mod_hash_string(self.pred)) != int(self.mod_hash_string(self.local_address)):
-			#print "mod_join_update_table_pred"
 
 			pred_add 		= (local_pre_succ_table['pred_pred']).split(":")
 			remote_proxy2 	= xmlrpclib.ServerProxy("http://" + str(pred_add[0]) + ":" + str(pred_add[1]) + "/")
@@ -383,7 +362,6 @@ class collab_system:
 
 #----------------- node join receive module ------------- (Main module)---------------------------
 	def mod_join_recv(self,remote_address):
-		##print "Received::, remote_address
 
 		remote_succ_pred = {'pred_pred':self.local_address,'pred':self.local_address,'succ':self.local_address,'succ_succ':self.local_address} 
 
@@ -420,10 +398,8 @@ class collab_system:
 		else:
 		#---------------------------- if the node is the left most node ---------------------------------------------------
 			if (int(self.mod_hash_string(self.pred)) > int(self.mod_hash_string(self.local_address))) and (int(self.mod_hash_string(self.succ)) > int(self.mod_hash_string(self.local_address))) :
-				##print "edge case 1"
 
 				if (int(self.mod_hash_string(remote_address)) > int(self.mod_hash_string(self.local_address))) and (int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.succ))) :
-					##print remote_address,"lies between me and my succssor"
 
 					remote_succ_pred['pred'] 	= self.local_address
 					remote_succ_pred['pred_pred'] 	= self.pred
@@ -437,7 +413,6 @@ class collab_system:
 					self.succ_succ 	= remote_succ_pred['succ']
 
 				elif int(self.mod_hash_string(remote_address)) > int(self.mod_hash_string(self.succ)):
-					##print remote_address,"greater than my succsseor"
 
 					succ_add 			= (self.succ).split(":")
 					remote_proxy2 		= xmlrpclib.ServerProxy("http://" + str(succ_add[0]) + ":" + str(succ_add[1]) + "/")
@@ -445,7 +420,6 @@ class collab_system:
 					remote_succ_pred 	= ll
 
 				elif int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.local_address)):
-					##print remote_address,"less than mine"
 
 					pred_add 			= (self.pred).split(":")
 					remote_proxy2 		= xmlrpclib.ServerProxy("http://" + str(pred_add[0]) + ":" + str(pred_add[1]) + "/")
@@ -456,10 +430,8 @@ class collab_system:
 
 			#---------------------------- if the node is the right most node ----------------------------------------------
 			elif int(self.mod_hash_string(self.pred)) < int(self.mod_hash_string(self.local_address)) and int(self.mod_hash_string(self.succ)) < int(self.mod_hash_string(self.local_address)):
-				##print "edge case 2"
 					
 				if( int(self.mod_hash_string(remote_address)) > int(self.mod_hash_string(self.local_address))) or ((int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.local_address))) and (int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.succ)))):
-					##print remote_address,"greater than mine or less than mine and my succ"
 
 					remote_succ_pred['pred'] 		= self.local_address
 					remote_succ_pred['pred_pred'] 	= self.pred
@@ -473,7 +445,6 @@ class collab_system:
 					self.succ_succ 	= remote_succ_pred['succ']
 
 				elif (int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.local_address))):
-					##print remote_address,"less than mine"
 
 					pred_add 			= (self.pred).split(":")
 					remote_proxy2 		= xmlrpclib.ServerProxy("http://" + str(pred_add[0]) + ":" + str(pred_add[1]) + "/")
@@ -484,10 +455,7 @@ class collab_system:
 
 			#---------------------------- if the node is the intermediate node --------------------------------------------
 			else:
-				##print "Main case"
-
 				if (int(self.mod_hash_string(remote_address)) > int(self.mod_hash_string(self.local_address)) and int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.succ)) ):
-					##print remote_address,"lies between me and my succssor"
 
 					remote_succ_pred['pred'] 		= self.local_address
 					remote_succ_pred['pred_pred'] 	= self.pred
@@ -501,7 +469,6 @@ class collab_system:
 					self.succ_succ 	= remote_succ_pred['succ']
 
 				elif int(self.mod_hash_string(remote_address)) < int(self.mod_hash_string(self.local_address)):
-					##print remote_address,"less than mine"
 
 					pred_add 			= (self.pred).split(":")
 					remote_proxy2 		= xmlrpclib.ServerProxy("http://" + str(pred_add[0]) + ":" + str(pred_add[1]) + "/")
@@ -509,7 +476,6 @@ class collab_system:
 					remote_succ_pred 	= ll
 
 				elif int(self.mod_hash_string(remote_address)) > int(self.mod_hash_string(self.succ)):
-					##print remote_address,"greater than my succssor"
 
 					succ_add 			= (self.succ).split(":")
 					remote_proxy2 		= xmlrpclib.ServerProxy("http://" + str(succ_add[0]) + ":" + str(succ_add[1]) + "/")
@@ -531,13 +497,10 @@ class collab_system:
 
 		mm = self.pre_succ_table_stabilization(pp)
 
-		#----------------- [Sumitro] -------------------------------------------------------------
-
 		remote_proxy = xmlrpclib.ServerProxy("http://" + self.succ + "/")
 
 		remote_proxy.mod_file_stabilize_req()
 
-		#----------------- [Sumitro] -------------------------------------------------------------
 		return mm
 
 #----------------- Probe sending ---------------------------------------------------------NEW-----
@@ -548,8 +511,6 @@ class collab_system:
 			ll 				= remote_proxy2.mod_prob_recv()
 
 		except:
-			##print self.local_address,"My succ has died"
-
 			self.succ 		= self.succ_succ
 			finger_table 	= {'pred_pred':self.pred_pred,'pred':self.pred,'succ':self.succ,'succ_succ':self.succ_succ}
 			succ_add 		= (self.succ).split(":")
@@ -611,9 +572,6 @@ class collab_system:
 
 		return address
 
-#----------------- Suman -----------------------------------------------------------------NEW-----
-
-#----------------- Sourav & Midhun----------------------------------------------------------------
 #----------------- Cache to store previous downloads in each node --------------------------------
 	def mod_cache_update(self,file_hash, actual_ip, actual_port):
 
@@ -661,8 +619,7 @@ class collab_system:
 
 #----------------- searching if the file is present in the node ----------------------------------
 	def mod_file_is_present(self,file_hash):
-		# just have to check whether the file_dict(file_hash,file_name) contains the file_hash or not.
-		# add map in class
+
 		return self.file_dict.has_key(file_hash)
 
 	# This function invoke from the mod_search if local node does not contain the file
@@ -683,7 +640,6 @@ class collab_system:
 			actual_list = [actual_ip,actual_port]
 
 		elif file_hash > self.mod_get_pred_hash() and file_hash < self.mod_get_own_hash():
-			#it is with me
 			if self.mod_file_is_present(file_hash):
 				actual_ip	= self.mod_get_address( self.mod_get_own_hash() )[0]
 				actual_port	= self.mod_get_address( self.mod_get_own_hash() )[1]
@@ -726,7 +682,6 @@ class collab_system:
 					actual_port	= 0
 
 			elif file_hash > self.mod_get_pred_hash() and file_hash < self.mod_get_own_hash():
-				#it is with me
 
 				if self.mod_file_is_present(file_hash):
 					actual_ip	= self.mod_get_address( self.mod_get_own_hash() )[0]
@@ -737,6 +692,7 @@ class collab_system:
 					actual_port	= 0
 
 			elif file_hash < self.mod_get_pred_hash() and self.mod_get_own_hash() != self.mod_get_pred_hash():
+				
 				try:
 					remote_proxy1 	= xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_pred_hash())[0]+ ":" + self.mod_get_address(self.mod_get_pred_hash())[1] + "/")
 					actual_list		= remote_proxy1.mod_rpc_search(file_hash)
@@ -761,7 +717,8 @@ class collab_system:
 			return False
 
 		else:
-			if self.local_ip==actual_ip and self.local_port==actual_port:
+			if self.local_ip == actual_ip and self.local_port == actual_port:
+
 				# Checking if the file name hash actually exists
 				file_name = self.mod_hash_check_file(file_hash)
 
@@ -792,6 +749,7 @@ class collab_system:
 			else:
 				try:
 					remote_proxy1 = xmlrpclib.ServerProxy("http://" + actual_ip + ":" + actual_port + "/")
+
 					download_file_size = remote_proxy1.mod_file_download_transfer(file_hash, self.local_ip, self.local_port, self.ratio)
 
 					self.download_amt = self.download_amt + download_file_size
@@ -813,15 +771,11 @@ class collab_system:
 			actual_port	= self.mod_get_address( self.mod_get_own_hash() )[1]
 
 		elif file_hash > self.mod_get_pred_hash() and file_hash < self.mod_get_own_hash():
-			#it should be with me - Normal Condition
-
 			actual_ip	= self.mod_get_address( self.mod_get_own_hash() )[0]
 			actual_port	= self.mod_get_address( self.mod_get_own_hash() )[1]
 
 		elif file_hash < self.mod_get_pred_hash() and self.mod_get_own_hash() != self.mod_get_pred_hash():
 			remote_proxy1 = xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_pred_hash())[0]+ ":" + self.mod_get_address(self.mod_get_pred_hash())[1] + "/")
-
-			###print remote_proxy1
 
 			actual_list = remote_proxy1.mod_rpc_upload( int(file_hash) )
 			actual_ip 	= actual_list[0]
@@ -829,8 +783,6 @@ class collab_system:
 
 		elif file_hash >= self.mod_get_own_hash() and self.mod_get_own_hash() != self.mod_get_succ_hash():
 			remote_proxy1 = xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_succ_hash())[0] + ":" + self.mod_get_address(self.mod_get_succ_hash())[1] + "/")
-
-			###print remote_proxy1
 
 			actual_list	= remote_proxy1.mod_rpc_upload( int(file_hash) )
 			actual_ip	= actual_list[0]
@@ -843,24 +795,18 @@ class collab_system:
 #----------------- Function to UPLOAD the file to Collab------------------------------------------
 	def mod_upload(self, file_path, file_name):
 		
-		file_hash = self.mod_hash_string(file_name)	
-		
-		###print self.mod_get_address(self.mod_get_succ_hash())[0] , ":" , self.mod_get_address(self.mod_get_succ_hash())[1]
+		file_hash = self.mod_hash_string(file_name)
 
 		if (file_hash < self.mod_get_own_hash() or file_hash > self.mod_get_pred_hash()) and self.mod_get_own_hash() < self.mod_get_pred_hash() and self.mod_get_own_hash() < self.mod_get_succ_hash():
 			actual_ip	= self.mod_get_address( self.mod_get_own_hash() )[0]
 			actual_port	= self.mod_get_address( self.mod_get_own_hash() )[1]
 
 		elif file_hash > self.mod_get_pred_hash() and file_hash < self.mod_get_own_hash():
-			#it should be with me - Normal Condition
-
 			actual_ip	= self.mod_get_address( self.mod_get_own_hash() )[0]
 			actual_port	= self.mod_get_address( self.mod_get_own_hash() )[1]
 
 		elif file_hash < self.mod_get_pred_hash() and self.mod_get_own_hash() != self.mod_get_pred_hash():
 			remote_proxy1 = xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_pred_hash())[0]+ ":" + self.mod_get_address(self.mod_get_pred_hash())[1] + "/")
-			
-			###print remote_proxy1
 
 			actual_list = remote_proxy1.mod_rpc_upload( int(file_hash) )
 			actual_ip 	= actual_list[0]
@@ -868,8 +814,6 @@ class collab_system:
 
 		elif file_hash >= self.mod_get_own_hash() and self.mod_get_own_hash() != self.mod_get_succ_hash():
 			remote_proxy1 = xmlrpclib.ServerProxy("http://" + self.mod_get_address(self.mod_get_succ_hash())[0] + ":" + self.mod_get_address(self.mod_get_succ_hash())[1] + "/")
-
-			###print remote_proxy1
 
 			actual_list	= remote_proxy1.mod_rpc_upload( int(file_hash) )
 			actual_ip	= actual_list[0]
@@ -892,19 +836,15 @@ class collab_system:
 				
 				print str(key) + "\t" + val_list[0] + "\t" + val_list[1] + "\t" + val_list[2]
 
-#----------------- Sourav and Midhun -------------------------------------------------------------
-
 def main():
-	# Details of current node
-	f = os.popen('ifconfig eth0 | grep "inet\ addr" | cut -d: -f2 | cut -d" " -f1')
-	your_ip=f.read()
-	your_ip = your_ip[0:-1]
-	#local_ip = "localhost"
-	local_ip = your_ip
-	#local_port = sys.argv[1]
-	local_port = '8000'
-	# Creating the local object
+	# Getting local IP from ifconfig command
+	f 			= os.popen('ifconfig eth0 | grep "inet\ addr" | cut -d: -f2 | cut -d" " -f1')
+	your_ip		= f.read()
+	your_ip 	= your_ip[0:-1]
+	local_ip 	= your_ip
+	local_port 	= config.SYS_PORT()
 	
+	# Creating the local object
 	local_node = collab_system(local_ip, local_port)
 
 	# Creating the directory which will contain all hosted files
@@ -916,8 +856,6 @@ def main():
 	# Declared an XMLRPC server
 	# This is the listener part of the application
 	local_listener = SimpleXMLRPCServer((local_ip, int(local_port)), logRequests = False, allow_none = True)
-	
-	##print "[Listening on port : %s]" % local_port
 
 	local_listener.register_introspection_functions()
 	local_listener.register_multicall_functions()
@@ -935,10 +873,8 @@ def main():
 
 	if len(sys.argv) == 2:
 		# Details of master node
-
-		#master_ip 	= "localhost"
-		master_ip = sys.argv[1]
-		master_port = '8000'
+		master_ip 	= sys.argv[1]
+		master_port = config.SYS_PORT()
 
 		conf = local_node.mod_join_req(master_ip,master_port)
 
@@ -957,8 +893,6 @@ def main():
 	probe_thread.daemon = True
 	probe_thread.start()
 
-	# local_node.return_pause()
-
 	while True:
 		os.system('clear')
 
@@ -975,14 +909,9 @@ def main():
 
 		if input_val == "1":
 			file_name = raw_input("\n\tEnter name of file to be downloaded : ")
-
-			# file_lookup = local_node.mod_file_download(file_name, remote_proxy)
 			
-			#------------ Sourav & Midhun ------------------------------------------------
 			file_hash	= local_node.mod_hash_string(file_name)
 			file_lookup = local_node.mod_search(file_hash )
-			#------------ Sourav & Midhun ------------------------------------------------
-			
 			
 			if file_lookup == False:
 				print "\n\tFile not found at remote node!"
@@ -999,13 +928,10 @@ def main():
 			file_path = "./" + file_name
 
 			if os.path.exists(file_path) == True:
-				# local_node.mod_file_upload(file_path, file_name, remote_proxy)
-				
-				#------------ Sourav & Midhun ------------------------------------------------
 				local_node.mod_upload( file_path, file_name )
-				#------------ Sourav & Midhun ------------------------------------------------
 				
 				print "\n\tFile uploaded!"
+
 			else:
 				print "\n\tFile not found at current node!"
 

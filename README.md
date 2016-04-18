@@ -16,10 +16,10 @@ An Incentive Based Self Stabilizing P2P File Storage System. Developed by a team
 * Redundant links in both forward and backward directions
 * An implementation of cached queries so that repeat queries are processed faster
 * Has an administrative menu which has lots of features to see the workings of the system like
-..* See list of files which are hosted by itself
-..* See list of files which are downloaded by itself
-..* See finger table
-..* See cache
+  * See list of files which are hosted by itself
+  * See list of files which are downloaded by itself
+  * See finger table
+  * See cache
 
 ### Changelog
 * Added a hash function which takes a string and a key space as input and returns a number. Key space is defined in the config file

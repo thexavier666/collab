@@ -42,28 +42,5 @@ An Incentive Based Self Stabilizing P2P File Storage System. Developed by a team
 * `python collab.py` for the first node
 * `python collab.py IP_ADDRESS` where `IP_ADDRESS` can be the IP of node which has already joined the system
 
-### To do (Sumitro)
-* [x] Add support to work from another machine (very easy)
-* [x] Node stabilize
-* [x] Integration
-* [x] Kill the server running in the background nicely
-* [x] Integrate the hash function in the upload and download function
-* [x] Put the downloaded files in a separate folder so that these files are not hosted
-* [x] Fix the bug where remote downloads are not counted as uploads by the remote server
-* [x] Data structure (Dictionary) of files downloaded at current node
-
-### To do (Suman)
-* [x] Node join
-* [x] Node join with proper successor in the shape of a ring
-* [x] Node finger table
-* [x] Displaying the menu
-* [x] Node leave
-
-### To do (Midhun)
-* [x] Global upload
-* [x] Global search
-* [x] Local search
-
-### To do (Sourav)
-* [x] Global search
-* [x] Cache implementation
+### Note
+The application takes the IP address according to a string-based script. Currently, it's set to take the IP address of the interface named `em1`. In a later update, it will be configurable by editing the config file

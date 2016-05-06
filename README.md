@@ -43,4 +43,4 @@ An Incentive Based Self Stabilizing P2P File Storage System. Developed by a team
 * `python collab.py IP_ADDRESS` where `IP_ADDRESS` can be the IP of node which has already joined the system
 
 ### Note
-The application takes the IP address according to a string-based script. Currently, it's set to take the IP address of the interface named `em1`. In a later update, it will be configurable by editing the config file
+The application takes the IP address according to a string-based script. Currently, it's set to take the IP address of the interface named `eth0`. In a later update, it will be configurable by editing the config file

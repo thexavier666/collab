@@ -830,11 +830,11 @@ class collab_system:
 		return True
 
 	def mod_cache_query(self):
-			print "File Hash\tLocal_IP\tLocal_Port\tTimestamp"
+			print "\tFile Hash\tLocal_IP\tLocal_Port\tTimestamp"
 
 			for key, val_list in self.cache.items():
 				
-				print str(key) + "\t" + val_list[0] + "\t" + val_list[1] + "\t" + val_list[2]
+				print "\t" + str(key) + "\t" + val_list[0] + "\t" + val_list[1] + "\t" + val_list[2]
 
 def main():
 	# Getting local IP from ifconfig command
@@ -842,7 +842,7 @@ def main():
 	your_ip		= f.read()
 	your_ip 	= your_ip[0:-1]
 	local_ip 	= your_ip
-	local_port 	= config.SYS_PORT()
+	local_port 	= str(config.SYS_PORT())
 	
 	# Creating the local object
 	local_node = collab_system(local_ip, local_port)

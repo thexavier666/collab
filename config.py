@@ -1,5 +1,5 @@
 # System Port
-def SYS_PORT()
+def SYS_PORT():
 	return 8000
 
 # Key space
@@ -19,7 +19,7 @@ def DEF_CACHE_TIMEOUT():
 def DEF_PROBE_TIME():
 	return 10
 
-# Sleep times (In seconds)
+# Sleep times (In seconds) for incentive
 def SLEEP_TIME_LEVEL_DEF():
 	return 1
 
@@ -27,10 +27,10 @@ def SLEEP_TIME_LEVEL_1():
 	return 2
 
 def SLEEP_TIME_LEVEL_2():
-        return 3
+    return 3
 
 def SLEEP_TIME_LEVEL_3():
-        return 4
+    return 4
 
 def SLEEP_TIME_LEVEL_4():
-        return 5
+    return 5

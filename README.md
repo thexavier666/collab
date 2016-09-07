@@ -1,11 +1,25 @@
 # collab
-An Incentive Based P2P Distributed File Storage System
+An Incentive Based Self Stabilizing P2P File Storage System. Developed by a team from IIT Kharagpur as a term project for the subject 'Distributed Systems' during the Spring 2016 session
 
-### Current features
-* Can connect to another node but in the same machine
+### Developers
+* Suman Mondal
+* Sourav Bhattacharjee
+* Midhun George
+* Sumitro Bhaumik
+
+### Features
+* Nodes join together in the shape of a ring
+* The ring can tolerate upto 1 fault
 * Can upload and download files from each other
-* Can view list of files which are hosted by the current node
 * Incentive and penalty based on upload to download ratio
+* Any node can be leader
+* Redundant links in both forward and backward directions
+* An implementation of cached queries so that repeat queries are processed faster
+* Has an administrative menu which has lots of features to see the workings of the system like
+  * See list of files which are hosted by itself
+  * See list of files which are downloaded by itself
+  * See finger table
+  * See cache
 
 ### Changelog
 * Added a hash function which takes a string and a key space as input and returns a number. Key space is defined in the config file
@@ -21,32 +35,12 @@ An Incentive Based P2P Distributed File Storage System
 * Downloads now take place in separate folders
 * Updated README files with individual responsibilities
 * Added a shell script which will delete all folders created due to the system
+* Huge update from Suman. I made some purely cosmetic changes to Suman's code
 
-### How to run Collab
+### How to start the Collab system
 * Run the following command for each node
-* `python collab.py port_number`
-* Inside the application, enter remote port as the port ID of the other node. Currently, the system supports pair wise connections
-* After running the application and exiting it, run the shell script `del.sh`
+* `python collab.py` for the first node
+* `python collab.py IP_ADDRESS` where `IP_ADDRESS` can be the IP of node which has already joined the system
 
-### To do (Sumitro)
-* [ ] Add support to work from another machine (very easy)
-* [x] Kill the server running in the background nicely
-* [x] Integrate the hash function in the upload and download function
-* [x] Put the downloaded files in a separate folder so that these files are not hosted
-* [x] Fix the bug where remote downloads are not counted as uploads by the remote server
-* [x] Data structure (Dictionary) of files downloaded at current node
-
-### To do (Suman)
-* [x] Node join
-* [ ] Node join with proper successor in the shape of a ring
-* [ ] Node stabilize
-* [ ] Node finger table
-* [ ] Displaying the menu
-
-### To do (Midhun)
-* [ ] Local search
-* [ ] Node leave
-
-### To do (Sourav)
-* [ ] Global search
-* [ ] Node leave
+### Note
+The application takes the IP address according to a bash script called inside the a python script. Currently, it's set to take the IP address of the interface named `eth0`. In a later update, it will be configurable by editing the config file
